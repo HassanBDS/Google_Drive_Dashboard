@@ -1,0 +1,27 @@
+{
+  "name": "google-drive-dashboard",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Visual disk usage analyzer and file explorer for Google Drive with multi-phase BFS scanning and resumable checkpoints.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "googleapis": "^171.4.0",
+    "lucide-react": "^1.8.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "typescript": "^5"
+  }
+}

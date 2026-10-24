@@ -1,0 +1,71 @@
+# =============================================================================
+# Google Drive Dashboard — .gitignore
+# =============================================================================
+
+# ── Credentials & Secrets ────────────────────────────────────────────────────
+# NEVER commit service account keys or any credential files
+secrets/*.json
+secrets/*.pem
+secrets/*.p12
+!secrets/.gitkeep
+
+# ── Environment Variables ─────────────────────────────────────────────────────
+# .env.local holds YOUR root folder ID and credentials path — never commit it
+.env
+.env.*
+!.env.example
+
+# ── Scan Cache & Checkpoints ──────────────────────────────────────────────────
+# Cache files contain folder names and IDs from YOUR Google Drive
+data/size-cache/*.json
+data/size-cache/*.json.tmp
+!data/size-cache/.gitkeep
+
+# ── Next.js Build Output ──────────────────────────────────────────────────────
+/.next/
+/out/
+build/
+dist/
+
+# ── Dependencies ──────────────────────────────────────────────────────────────
+/node_modules
+/.pnp
+.pnp.js
+
+# ── TypeScript ────────────────────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ── Testing & Coverage ────────────────────────────────────────────────────────
+/coverage
+
+# ── OS Generated Files ────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ── IDE & Editor ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── Agent / AI tooling (workspace-local, not for public) ─────────────────────
+.agents/
+tickets/
+docs/

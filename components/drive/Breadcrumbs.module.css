@@ -1,0 +1,49 @@
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.crumb:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.crumbActive {
+  color: var(--text-primary);
+  cursor: default;
+  font-weight: 600;
+}
+
+.crumbActive:hover {
+  background: none;
+}
+
+.separator {
+  color: var(--text-dim);
+  font-size: 12px;
+  user-select: none;
+}
+
+.homeIcon {
+  width: 14px;
+  height: 14px;
+}

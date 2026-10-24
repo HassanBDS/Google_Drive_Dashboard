@@ -1,0 +1,520 @@
+/* ── Google Drive Dashboard — Design System v2 ──────────────────────── */
+/* Fonts loaded via layout.tsx (Next.js next/font). No @import needed.   */
+
+/* ── Design Tokens (Default / Light Mode) ───────────────────────────── */
+:root {
+  /* ── New: Bento / Redesign semantic palette ────────────────────────── */
+  /* Primary — Drive Blue */
+  --color-primary:          #2563EB;
+  --color-on-primary:       #FFFFFF;
+  --color-secondary:        #3B82F6;
+  --color-on-secondary:     #000000;
+
+  /* Accent — Amber (files, alerts, CTA) */
+  --color-accent:           #D97706;
+  --color-on-accent:        #000000;
+
+  /* Semantic surface palette */
+  --color-background:       #F8FAFC;
+  --color-foreground:       #0F172A;
+  --color-card:             #FFFFFF;
+  --color-card-foreground:  #0F172A;
+  --color-muted:            #F1F5FD;
+  --color-muted-foreground: #475569;
+  --color-border:           #E4ECFC;
+  --color-destructive:      #DC2626;
+  --color-on-destructive:   #FFFFFF;
+  --color-ring:             #2563EB;
+
+  /* Status semantic tokens */
+  --color-success:  #059669;
+  --color-warning:  #D97706;
+  --color-error:    #DC2626;
+
+  /* ── Glassmorphism tokens ───────────────────────────────────────────── */
+  --glass-bg:     rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(37, 99, 235, 0.12);
+  --glass-blur:   blur(14px);
+  --glass-shadow: 0 4px 24px rgba(37, 99, 235, 0.08);
+
+  /* ── Bento Grid tokens ──────────────────────────────────────────────── */
+  --bento-gap:               16px;
+  --bento-card-radius:       20px;
+  --bento-card-bg:           #FFFFFF;
+  --bento-card-border:       1px solid #E4ECFC;
+  --bento-card-shadow:       0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(37, 99, 235, 0.06);
+  --bento-card-shadow-hover: 0 4px 20px rgba(37, 99, 235, 0.14);
+
+  /* ── Typography tokens ─────────────────────────────────────────────── */
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+  --font-mono:    'Fira Code', 'Cascadia Code', 'Menlo', monospace;
+
+  /* ── Legacy tokens preserved for backward compatibility ─────────────── */
+  /* All existing components reference these and continue to work.        */
+  --bg-primary:     #F8FAFC;
+  --bg-secondary:   #FFFFFF;
+  --bg-tertiary:    #F1F5FD;
+  --bg-card:        rgba(37, 99, 235, 0.03);
+  --bg-card-hover:  rgba(37, 99, 235, 0.06);
+  --bg-surface:     rgba(37, 99, 235, 0.04);
+
+  --accent:       #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-muted: rgba(37, 99, 235, 0.10);
+  --accent-glow:  rgba(37, 99, 235, 0.18);
+
+  --text-primary:   #0F172A;
+  --text-secondary: #1E293B;
+  --text-muted:     #64748B;
+  --text-dim:       #94A3B8;
+
+  --border:        rgba(37, 99, 235, 0.10);
+  --border-hover:  rgba(37, 99, 235, 0.22);
+  --border-strong: rgba(37, 99, 235, 0.32);
+
+  /* Language badge colors */
+  --lang-en:    #2563eb;
+  --lang-en-bg: rgba(37, 99, 235, 0.1);
+  --lang-es:    #d97706;
+  --lang-es-bg: rgba(217, 119, 6, 0.1);
+  --lang-fr:    #db2777;
+  --lang-fr-bg: rgba(219, 39, 119, 0.1);
+  --lang-de:    #059669;
+  --lang-de-bg: rgba(5, 150, 105, 0.1);
+  --lang-pt:    #7c3aed;
+  --lang-pt-bg: rgba(124, 58, 237, 0.1);
+  --lang-it:    #0284c7;
+  --lang-it-bg: rgba(2, 132, 199, 0.1);
+  --lang-cn:    #dc2626;
+  --lang-cn-bg: rgba(220, 38, 38, 0.1);
+  --lang-id:    #ea580c;
+  --lang-id-bg: rgba(234, 88, 12, 0.1);
+  --lang-ru:    #4f46e5;
+  --lang-ru-bg: rgba(79, 70, 229, 0.1);
+  --lang-th:    #0d9488;
+  --lang-th-bg: rgba(13, 148, 136, 0.1);
+  --lang-tr:    #e11d48;
+  --lang-tr-bg: rgba(225, 29, 72, 0.1);
+  --lang-vn:    #0891b2;
+  --lang-vn-bg: rgba(8, 145, 178, 0.1);
+  --lang-vi:    #0891b2;
+  --lang-vi-bg: rgba(8, 145, 178, 0.1);
+  --lang-ja:    #e11d48;
+  --lang-ja-bg: rgba(225, 29, 72, 0.1);
+  --lang-ko:    #4f46e5;
+  --lang-ko-bg: rgba(79, 70, 229, 0.1);
+  --lang-ar:    #047857;
+  --lang-ar-bg: rgba(4, 120, 87, 0.1);
+  --lang-pl:    #dc2626;
+  --lang-pl-bg: rgba(220, 38, 38, 0.1);
+
+  /* Status (legacy names) */
+  --success: #059669;
+  --warning: #D97706;
+  --error:   #DC2626;
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:   0 4px 12px rgba(37, 99, 235, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg:   0 8px 32px rgba(37, 99, 235, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-xl:   0 20px 48px rgba(37, 99, 235, 0.16), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 24px var(--accent-glow);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition:      200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --sidebar-width:           260px;
+  --sidebar-collapsed-width: 80px;
+  --header-height:           64px;
+}
+
+/* ── Dark Mode — Obsidian ───────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  /* New semantic palette */
+  --color-primary:          #3B82F6;
+  --color-on-primary:       #FFFFFF;
+  --color-secondary:        #60A5FA;
+  --color-on-secondary:     #0F172A;
+  --color-accent:           #F59E0B;
+  --color-on-accent:        #0F172A;
+  --color-background:       #0B0F19;
+  --color-foreground:       #F8FAFC;
+  --color-card:             rgba(17, 25, 42, 0.90);
+  --color-card-foreground:  #F8FAFC;
+  --color-muted:            rgba(255, 255, 255, 0.05);
+  --color-muted-foreground: #94A3B8;
+  --color-border:           rgba(255, 255, 255, 0.08);
+  --color-destructive:      #EF4444;
+  --color-on-destructive:   #0B0F19;
+  --color-ring:             #3B82F6;
+  --color-success:          #10B981;
+  --color-warning:          #F59E0B;
+  --color-error:            #EF4444;
+
+  /* Glassmorphism */
+  --glass-bg:     rgba(17, 25, 42, 0.75);
+  --glass-border: rgba(59, 130, 246, 0.18);
+  --glass-blur:   blur(16px);
+  --glass-shadow: 0 4px 32px rgba(0, 0, 0, 0.50);
+
+  /* Bento */
+  --bento-card-bg:           rgba(17, 25, 42, 0.90);
+  --bento-card-border:       1px solid rgba(59, 130, 246, 0.15);
+  --bento-card-shadow:       0 1px 3px rgba(0, 0, 0, 0.50), 0 4px 20px rgba(0, 0, 0, 0.40);
+  --bento-card-shadow-hover: 0 4px 24px rgba(59, 130, 246, 0.22);
+
+  /* Legacy tokens */
+  --bg-primary:     #0B0F19;
+  --bg-secondary:   #111827;
+  --bg-tertiary:    #1A2235;
+  --bg-card:        rgba(255, 255, 255, 0.04);
+  --bg-card-hover:  rgba(255, 255, 255, 0.07);
+  --bg-surface:     rgba(255, 255, 255, 0.06);
+
+  --accent:       #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-muted: rgba(59, 130, 246, 0.15);
+  --accent-glow:  rgba(59, 130, 246, 0.25);
+
+  --text-primary:   #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-muted:     #94A3B8;
+  --text-dim:       #64748B;
+
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-hover:  rgba(255, 255, 255, 0.20);
+  --border-strong: rgba(255, 255, 255, 0.30);
+
+  --lang-en: #60a5fa; --lang-en-bg: rgba(96, 165, 250, 0.15);
+  --lang-es: #fbbf24; --lang-es-bg: rgba(251, 191, 36, 0.15);
+  --lang-fr: #f472b6; --lang-fr-bg: rgba(244, 114, 182, 0.15);
+  --lang-de: #34d399; --lang-de-bg: rgba(52, 211, 153, 0.15);
+  --lang-pt: #a78bfa; --lang-pt-bg: rgba(167, 139, 250, 0.15);
+  --lang-it: #38bdf8; --lang-it-bg: rgba(56, 189, 248, 0.15);
+  --lang-cn: #f87171; --lang-cn-bg: rgba(248, 113, 113, 0.15);
+  --lang-id: #fb923c; --lang-id-bg: rgba(251, 146, 60, 0.15);
+  --lang-ru: #818cf8; --lang-ru-bg: rgba(129, 140, 248, 0.15);
+  --lang-th: #2dd4bf; --lang-th-bg: rgba(45, 212, 191, 0.15);
+  --lang-tr: #fb7185; --lang-tr-bg: rgba(251, 113, 133, 0.15);
+  --lang-vn: #22d3ee; --lang-vn-bg: rgba(34, 211, 238, 0.15);
+  --lang-vi: #22d3ee; --lang-vi-bg: rgba(34, 211, 238, 0.15);
+  --lang-ja: #fda4af; --lang-ja-bg: rgba(253, 164, 175, 0.15);
+  --lang-ko: #a5b4fc; --lang-ko-bg: rgba(165, 180, 252, 0.15);
+  --lang-ar: #6ee7b7; --lang-ar-bg: rgba(110, 231, 183, 0.15);
+  --lang-pl: #f87171; --lang-pl-bg: rgba(248, 113, 113, 0.15);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error:   #EF4444;
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.50);
+  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.50);
+  --shadow-lg:   0 8px 40px rgba(0, 0, 0, 0.60);
+  --shadow-xl:   0 20px 60px rgba(0, 0, 0, 0.70);
+  --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.30);
+}
+
+/* ── Dim Mode — Slate Blue ──────────────────────────────────────────── */
+:root[data-theme="dim"] {
+  /* New semantic palette */
+  --color-primary:          #3B82F6;
+  --color-on-primary:       #FFFFFF;
+  --color-secondary:        #60A5FA;
+  --color-on-secondary:     #0F172A;
+  --color-accent:           #F59E0B;
+  --color-on-accent:        #0F172A;
+  --color-background:       #0F172A;
+  --color-foreground:       #F8FAFC;
+  --color-card:             rgba(30, 41, 59, 0.90);
+  --color-card-foreground:  #F8FAFC;
+  --color-muted:            rgba(255, 255, 255, 0.05);
+  --color-muted-foreground: #CBD5E1;
+  --color-border:           rgba(255, 255, 255, 0.10);
+  --color-destructive:      #EF4444;
+  --color-on-destructive:   #0F172A;
+  --color-ring:             #3B82F6;
+  --color-success:          #10B981;
+  --color-warning:          #F59E0B;
+  --color-error:            #EF4444;
+
+  /* Glassmorphism */
+  --glass-bg:     rgba(30, 41, 59, 0.78);
+  --glass-border: rgba(59, 130, 246, 0.20);
+  --glass-blur:   blur(14px);
+  --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.40);
+
+  /* Bento */
+  --bento-card-bg:           rgba(30, 41, 59, 0.90);
+  --bento-card-border:       1px solid rgba(59, 130, 246, 0.18);
+  --bento-card-shadow:       0 1px 3px rgba(0, 0, 0, 0.40), 0 4px 16px rgba(0, 0, 0, 0.30);
+  --bento-card-shadow-hover: 0 4px 24px rgba(59, 130, 246, 0.18);
+
+  /* Legacy tokens */
+  --bg-primary:     #0F172A;
+  --bg-secondary:   #1E293B;
+  --bg-tertiary:    #334155;
+  --bg-card:        rgba(255, 255, 255, 0.04);
+  --bg-card-hover:  rgba(255, 255, 255, 0.07);
+  --bg-surface:     rgba(255, 255, 255, 0.06);
+
+  --accent:       #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-muted: rgba(59, 130, 246, 0.15);
+  --accent-glow:  rgba(59, 130, 246, 0.22);
+
+  --text-primary:   #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-muted:     #CBD5E1;
+  --text-dim:       #94A3B8;
+
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-hover:  rgba(255, 255, 255, 0.20);
+  --border-strong: rgba(255, 255, 255, 0.30);
+
+  --lang-en: #60a5fa; --lang-en-bg: rgba(96, 165, 250, 0.15);
+  --lang-es: #fbbf24; --lang-es-bg: rgba(251, 191, 36, 0.15);
+  --lang-fr: #f472b6; --lang-fr-bg: rgba(244, 114, 182, 0.15);
+  --lang-de: #34d399; --lang-de-bg: rgba(52, 211, 153, 0.15);
+  --lang-pt: #a78bfa; --lang-pt-bg: rgba(167, 139, 250, 0.15);
+  --lang-it: #38bdf8; --lang-it-bg: rgba(56, 189, 248, 0.15);
+  --lang-cn: #f87171; --lang-cn-bg: rgba(248, 113, 113, 0.15);
+  --lang-id: #fb923c; --lang-id-bg: rgba(251, 146, 60, 0.15);
+  --lang-ru: #818cf8; --lang-ru-bg: rgba(129, 140, 248, 0.15);
+  --lang-th: #2dd4bf; --lang-th-bg: rgba(45, 212, 191, 0.15);
+  --lang-tr: #fb7185; --lang-tr-bg: rgba(251, 113, 133, 0.15);
+  --lang-vn: #22d3ee; --lang-vn-bg: rgba(34, 211, 238, 0.15);
+  --lang-vi: #22d3ee; --lang-vi-bg: rgba(34, 211, 238, 0.15);
+  --lang-ja: #fda4af; --lang-ja-bg: rgba(253, 164, 175, 0.15);
+  --lang-ko: #a5b4fc; --lang-ko-bg: rgba(165, 180, 252, 0.15);
+  --lang-ar: #6ee7b7; --lang-ar-bg: rgba(110, 231, 183, 0.15);
+  --lang-pl: #f87171; --lang-pl-bg: rgba(248, 113, 113, 0.15);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error:   #EF4444;
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.40);
+  --shadow-lg:   0 8px 40px rgba(0, 0, 0, 0.50);
+  --shadow-xl:   0 20px 60px rgba(0, 0, 0, 0.60);
+  --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.25);
+}
+
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+/* ── App Layout ────────────────────────────────────────────────────── */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-area {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left var(--transition-slow);
+}
+
+html:has(.sidebar-collapsed) .main-area {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+.page-content {
+  flex: 1;
+  padding: 24px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Bento Grid Utilities ──────────────────────────────────────────── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--bento-gap);
+}
+
+.bento-card {
+  background: var(--bento-card-bg);
+  border: var(--bento-card-border);
+  border-radius: var(--bento-card-radius);
+  box-shadow: var(--bento-card-shadow);
+  padding: 20px 24px;
+  transition: box-shadow var(--transition), transform var(--transition-fast);
+}
+
+.bento-card:hover {
+  box-shadow: var(--bento-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.bento-card.span-2 { grid-column: span 2; }
+.bento-card.span-3 { grid-column: span 3; }
+.bento-card.span-4 { grid-column: span 4; }
+
+/* Glass surface variant */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--bento-card-radius);
+}
+
+/* ── Language Badges ───────────────────────────────────────────────── */
+.lang-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lang-badge.en { color: var(--lang-en); background: var(--lang-en-bg); }
+.lang-badge.es { color: var(--lang-es); background: var(--lang-es-bg); }
+.lang-badge.fr { color: var(--lang-fr); background: var(--lang-fr-bg); }
+.lang-badge.de { color: var(--lang-de); background: var(--lang-de-bg); }
+.lang-badge.pt { color: var(--lang-pt); background: var(--lang-pt-bg); }
+.lang-badge.it { color: var(--lang-it); background: var(--lang-it-bg); }
+.lang-badge.cn { color: var(--lang-cn); background: var(--lang-cn-bg); }
+.lang-badge.id { color: var(--lang-id); background: var(--lang-id-bg); }
+.lang-badge.ru { color: var(--lang-ru); background: var(--lang-ru-bg); }
+
+/* ── Skeleton Loading ──────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--border) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ── Motion Utilities ──────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* ── Focus Ring (keyboard-only, WCAG 2.4.11) ──────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ── Responsive Bento ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+  .bento-card.span-3,
+  .bento-card.span-4 { grid-column: span 2; }
+}
+
+@media (max-width: 768px) {
+  .main-area { margin-left: 0 !important; }
+  .page-content { padding: 16px; }
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-card.span-2,
+  .bento-card.span-3,
+  .bento-card.span-4 { grid-column: span 1; }
+}
+
+/* ── Reduced Motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:       0.01ms !important;
+  }
+}
