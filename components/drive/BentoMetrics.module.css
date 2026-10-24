@@ -1,0 +1,380 @@
+/* ── BentoMetrics Asymmetric Grid ────────────────────────────────────── */
+
+.bentoContainer {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.bentoGrid {
+  display: grid;
+  grid-template-columns: 1.8fr 1.1fr 1.1fr;
+  gap: var(--bento-gap, 16px);
+  align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+  .bentoGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .heroCard {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .bentoGrid {
+    grid-template-columns: 1fr;
+  }
+  .heroCard {
+    grid-column: auto;
+  }
+}
+
+/* ── Base Bento Card ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bento-card-bg, rgba(17, 25, 42, 0.90));
+  border: var(--bento-card-border, 1px solid var(--color-border, rgba(255, 255, 255, 0.08)));
+  border-radius: var(--bento-card-radius, 20px);
+  padding: 22px 24px;
+  box-shadow: var(--bento-card-shadow, 0 4px 20px rgba(0, 0, 0, 0.2));
+  backdrop-filter: var(--glass-blur, blur(16px));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  min-height: 220px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bento-card-shadow-hover, 0 8px 30px rgba(37, 99, 235, 0.16));
+  border-color: var(--color-ring, rgba(59, 130, 246, 0.3));
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-muted, rgba(59, 130, 246, 0.12));
+  color: var(--color-primary, #3B82F6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconWrapAccent {
+  background: rgba(245, 158, 11, 0.14);
+  color: #F59E0B;
+}
+
+.iconWrapSuccess {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10B981;
+}
+
+.cardTitle {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.depthBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.06));
+  color: var(--color-muted-foreground, #94A3B8);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+/* ── Hero Card (Storage Overview) ────────────────────────────────────── */
+.heroLayout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.heroMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 170px;
+}
+
+.heroValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.heroValue {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-foreground, #F8FAFC);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.heroValueSub {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+}
+
+.heroSubtitle {
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+  line-height: 1.4;
+}
+
+.heroProgressWrap {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heroProgressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.08));
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.heroProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #2563EB), #60A5FA);
+  border-radius: 9999px;
+  transition: width 350ms ease;
+}
+
+.heroProgressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  color: var(--color-muted-foreground, #94A3B8);
+}
+
+.heroChartMini {
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ── Telemetry Card ──────────────────────────────────────────────────── */
+.telemetryBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+
+.telemetryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.telemetryLabel {
+  color: var(--color-muted-foreground, #94A3B8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.telemetryVal {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: pulse 1.8s infinite;
+}
+
+.pulseDotScanning {
+  background: #3B82F6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  animation: pulse 0.9s infinite;
+}
+
+.pulseDotCheckpoint {
+  background: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.checkpointBanner {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: #F59E0B;
+}
+
+.checkpointBtn {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs, 6px);
+  background: #F59E0B;
+  color: #0B0F19;
+  border: none;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.checkpointBtn:hover {
+  opacity: 0.9;
+}
+
+/* ── Hygiene Card ────────────────────────────────────────────────────── */
+.hygieneBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.hygieneTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.hygieneScoreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.hygieneScoreWarning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.hygieneScoreDanger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.hygieneItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.05));
+}
+
+.hygieneItem:last-child {
+  border-bottom: none;
+}
+
+.hygieneItemLabel {
+  color: var(--color-muted-foreground, #94A3B8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hygieneItemVal {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+}
+
+/* ── Skeletons (CLS < 0.05) ──────────────────────────────────────────── */
+.skeletonCard {
+  min-height: 220px;
+  background: var(--bento-card-bg, rgba(17, 25, 42, 0.90));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--bento-card-radius, 20px);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeletonLine {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted, rgba(255, 255, 255, 0.04)) 25%,
+    rgba(255, 255, 255, 0.08) 37%,
+    var(--color-muted, rgba(255, 255, 255, 0.04)) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}

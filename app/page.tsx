@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/drive/Breadcrumbs";
-import DriveMetrics from "@/components/drive/DriveMetrics";
+import BentoMetrics from "@/components/drive/BentoMetrics";
 import FolderCardGrid, { FolderStat, SortMode } from "@/components/drive/FolderCard";
 import FileTable from "@/components/drive/FileTable";
 import ScanProgressPanel from "@/components/drive/ScanProgressPanel";
@@ -386,7 +386,7 @@ function DriveDashboardContent() {
           <>
             <Breadcrumbs items={data.breadcrumbs} onNavigate={handleNavigate} />
 
-            <DriveMetrics
+            <BentoMetrics
               folderCount={stats?.folderCount ?? 0}
               fileCount={stats?.fileCount ?? 0}
               totalSize={stats?.totalSize ?? 0}
@@ -400,6 +400,13 @@ function DriveDashboardContent() {
               isCacheStale={deepScanData?.stale}
               scannedLocalesCount={deepScanData?.locales?.length ?? 0}
               totalLocalesCount={stats?.folderCount ?? 0}
+              files={data.files}
+              folders={data.folders}
+              folderStats={folderStats}
+              folderScanStates={folderScanStates}
+              activeCheckpoints={activeCheckpoints}
+              onStartScan={(folderId) => startFolderScan(folderId, depth + 1)}
+              currentFolderId={currentFolder || undefined}
             />
 
             {anyScanning && (
