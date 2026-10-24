@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/drive/Breadcrumbs";
 import BentoMetrics from "@/components/drive/BentoMetrics";
 import FolderCardGrid, { FolderStat, SortMode } from "@/components/drive/FolderCard";
 import FileTable from "@/components/drive/FileTable";
+import FolderInspector from "@/components/drive/FolderInspector";
 import ScanProgressPanel from "@/components/drive/ScanProgressPanel";
 import OnboardingWizard from "@/components/setup/OnboardingWizard";
 import styles from "./drive.module.css";
@@ -93,6 +94,7 @@ function DriveDashboardContent() {
   const [activeCheckpoints, setActiveCheckpoints] = useState<Record<string, { startedAt: string; foldersScanned: number }>>({});
   const [deepScanData, setDeepScanData] = useState<DeepScanCacheResponse | null>(null);
   const [totalScannedSize, setTotalScannedSize] = useState<number>(0);
+  const [inspectedFolder, setInspectedFolder] = useState<DriveItem | null>(null);
 
   const abortRefs = useRef<Map<string, AbortController>>(new Map());
 
@@ -455,9 +457,26 @@ function DriveDashboardContent() {
               onStartFolderScan={(folderId) => startFolderScan(folderId, depth + 1)}
               onStopFolderScan={stopFolderScan}
               parentTotalSize={effectiveDeepStats?.totalSize ?? (totalScannedSize > 0 ? totalScannedSize : undefined)}
+              onInspect={(folderId) => {
+                const target = data?.folders.find((f) => f.id === folderId);
+                if (target) setInspectedFolder(target);
+              }}
             />
 
             <FileTable files={filteredFiles} onRefresh={handleRefresh} />
+
+            <FolderInspector
+              folder={inspectedFolder}
+              isOpen={Boolean(inspectedFolder)}
+              onClose={() => setInspectedFolder(null)}
+              folderStats={inspectedFolder ? folderStats[inspectedFolder.id] : undefined}
+              scanState={inspectedFolder ? folderScanStates.get(inspectedFolder.id) : undefined}
+              checkpoint={inspectedFolder ? activeCheckpoints[inspectedFolder.id] : undefined}
+              onStartScan={(folderId) => startFolderScan(folderId, depth + 1)}
+              onStopScan={stopFolderScan}
+              onOpenFolder={handleNavigate}
+              onRefresh={handleRefresh}
+            />
           </>
         )}
       </div>

@@ -1,0 +1,374 @@
+/* ── Folder Slide-Out Inspector Drawer Styles ────────────────────────── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+.backdropOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 460px;
+  max-width: 92vw;
+  background: var(--bento-card-bg, #0B0F19);
+  border-left: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  overflow: hidden;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.folderIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md, 12px);
+  background: var(--color-muted, rgba(59, 130, 246, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.headerInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.title {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-foreground, #F8FAFC);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--color-muted-foreground, #94A3B8);
+  margin-top: 2px;
+}
+
+.closeBtn {
+  background: transparent;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  color: var(--color-muted-foreground, #94A3B8);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast, 150ms ease);
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  color: var(--color-foreground, #F8FAFC);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Scrollable Body ─────────────────────────────────────────────────── */
+.body {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ── 2x2 Metadata Bento Grid ─────────────────────────────────────────── */
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.metaCard {
+  background: var(--color-muted, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-md, 12px);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.metaCard:hover {
+  border-color: var(--color-ring, rgba(59, 130, 246, 0.25));
+}
+
+.metaLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-muted-foreground, #94A3B8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metaVal {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-foreground, #F8FAFC);
+}
+
+.metaSub {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  color: var(--color-muted-foreground, #64748B);
+}
+
+/* ── Checkpoint & Telemetry HUD ──────────────────────────────────────── */
+.telemetryBox {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: var(--radius-md, 12px);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.telemetryBoxActive {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.telemetryBoxWarning {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.telemetryTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.telemetryTitle {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.telemetryText {
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Top Children Subtree Breakdown ──────────────────────────────────── */
+.subtreeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionLabel {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.childList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.childRow {
+  background: var(--color-muted, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.childRow:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-ring, rgba(59, 130, 246, 0.3));
+  transform: translateX(2px);
+}
+
+.childRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.childName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-foreground, #F8FAFC);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.childSize {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+}
+
+.childBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.childFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary, #3B82F6), #60A5FA);
+  border-radius: 9999px;
+  transition: width 300ms ease;
+}
+
+/* ── Actions Footer ──────────────────────────────────────────────────── */
+.footer {
+  padding: 18px 24px;
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.primaryActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn {
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast, 150ms ease);
+  text-decoration: none;
+}
+
+.btnPrimary {
+  background: var(--color-primary, #2563EB);
+  color: #FFFFFF;
+}
+
+.btnPrimary:hover {
+  background: #1D4ED8;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
+}
+
+.btnSecondary {
+  background: var(--color-muted, rgba(255, 255, 255, 0.06));
+  color: var(--color-foreground, #F8FAFC);
+  border-color: var(--color-border, rgba(255, 255, 255, 0.1));
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btnDanger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.btnDanger:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
