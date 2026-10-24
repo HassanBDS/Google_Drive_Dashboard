@@ -1,223 +1,387 @@
+/* ── Enhanced High-Density FileTable Styles ───────────────────────────── */
+
 .wrapper {
-  margin-top: 8px;
+  margin-top: 14px;
+  width: 100%;
 }
 
-.sectionTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 14px;
+.headerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.titleGroup {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .sectionIcon {
-  width: 16px;
-  height: 16px;
-  color: var(--text-dim);
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary, #3B82F6);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.countBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.06));
+  color: var(--color-muted-foreground, #94A3B8);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+/* ── Filter Pills Bar ────────────────────────────────────────────────── */
+.filterPills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filterPill {
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  background: var(--color-muted, rgba(255, 255, 255, 0.04));
+  color: var(--color-muted-foreground, #94A3B8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.filterPill:hover {
+  color: var(--color-foreground, #F8FAFC);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.filterPillActive {
+  background: var(--color-primary, #2563EB);
+  color: #FFFFFF;
+  border-color: var(--color-primary, #2563EB);
+  box-shadow: 0 1px 6px rgba(37, 99, 235, 0.35);
+}
+
+.pillBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+/* ── Bulk Actions Banner ─────────────────────────────────────────────── */
+.bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-radius: var(--radius-md, 12px);
+  background: rgba(37, 99, 235, 0.14);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  margin-bottom: 12px;
+  animation: fadeIn 150ms ease-out;
+}
+
+.bulkInfo {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-foreground, #F8FAFC);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bulkDeleteBtn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-xs, 6px);
+  background: #EF4444;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 150ms ease;
+}
+
+.bulkDeleteBtn:hover {
+  opacity: 0.9;
+}
+
+.bulkCancelBtn {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: var(--radius-xs, 6px);
+  background: transparent;
+  color: var(--color-muted-foreground, #94A3B8);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  cursor: pointer;
+}
+
+.bulkCancelBtn:hover {
+  color: var(--color-foreground, #F8FAFC);
+}
+
+/* ── Table Container ─────────────────────────────────────────────────── */
+.tableWrap {
+  background: var(--bento-card-bg, rgba(17, 25, 42, 0.90));
+  border: var(--bento-card-border, 1px solid var(--color-border, rgba(255, 255, 255, 0.08)));
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--bento-card-shadow, 0 4px 20px rgba(0, 0, 0, 0.2));
+  backdrop-filter: var(--glass-blur, blur(16px));
+  overflow-x: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  border-spacing: 0;
-}
-
-.thead {
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  font-size: 13px;
 }
 
 .thead th {
-  background: var(--bg-tertiary);
-  padding: 10px 16px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.03));
+  padding: 10px 14px;
   text-align: left;
+  font-family: var(--font-heading, sans-serif);
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--color-muted-foreground, #94A3B8);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-  cursor: pointer;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
   user-select: none;
-  transition: color var(--transition);
-}
-
-.thead th:hover {
-  color: var(--text-primary);
-}
-
-.thead th:first-child {
-  border-radius: var(--radius-md) 0 0 0;
-}
-
-.thead th:last-child {
-  border-radius: 0 var(--radius-md) 0 0;
-}
-
-.sortIcon {
-  display: inline-block;
-  margin-left: 4px;
-  font-size: 10px;
-  opacity: 0.5;
-}
-
-.tbody tr {
-  transition: background var(--transition);
-  border-bottom: 1px solid var(--border);
-}
-
-.tbody tr:hover {
-  background: var(--bg-card-hover);
-}
-
-.tbody tr:last-child {
-  border-bottom: none;
-}
-
-.tbody td {
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  vertical-align: middle;
-}
-
-.nameCell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-primary) !important;
-  font-weight: 500;
-}
-
-.fileIcon {
-  font-size: 18px;
-  flex-shrink: 0;
-  width: 24px;
-  text-align: center;
-}
-
-.fileName {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 400px;
-}
-
-.typeCell {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.sizeCell {
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.dateCell {
-  white-space: nowrap;
+.sortableTh {
+  cursor: pointer;
+  transition: color var(--transition-fast, 150ms ease);
 }
 
-.actions {
+.sortableTh:hover {
+  color: var(--color-foreground, #F8FAFC);
+}
+
+.thContent {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.actionBtn {
+.thSortIcon {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all var(--transition);
-  text-decoration: none;
+  color: var(--color-primary, #3B82F6);
 }
 
-.actionBtn:hover {
-  background: var(--bg-surface);
-  color: var(--accent);
-}
-
-.emptyState {
+/* ── Checkbox ────────────────────────────────────────────────────────── */
+.checkboxTh,
+.checkboxCell {
+  width: 36px;
+  padding: 10px 12px;
   text-align: center;
-  padding: 48px 24px;
-  color: var(--text-muted);
 }
 
-.emptyIcon {
-  font-size: 40px;
-  margin-bottom: 12px;
-  opacity: 0.4;
+.checkbox {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+  background: var(--color-muted, rgba(255, 255, 255, 0.05));
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition: all var(--transition-fast, 150ms ease);
+  outline: none;
 }
 
-.emptyText {
-  font-size: 14px;
-  font-weight: 500;
+.checkbox:checked {
+  background: var(--color-primary, #2563EB);
+  border-color: var(--color-primary, #2563EB);
 }
 
-.tableWrap {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+.checkbox:checked::before {
+  content: "✓";
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
-.editWrap {
+/* ── Rows ────────────────────────────────────────────────────────────── */
+.row {
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.04));
+  transition: background var(--transition-fast, 150ms ease);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rowSelected {
+  background: rgba(37, 99, 235, 0.08) !important;
+}
+
+.nameCell {
+  padding: 10px 14px;
   display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.fileIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.fileName {
+  font-weight: 500;
+  color: var(--color-foreground, #F8FAFC);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.typeCell {
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+.categoryPill {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.sizeCell {
+  padding: 10px 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--color-foreground, #F8FAFC);
+  white-space: nowrap;
+}
+
+.dateCell {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+  white-space: nowrap;
+}
+
+.actionCell {
+  padding: 10px 14px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.actionGroup {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
+.actionBtn,
+.linkBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-muted-foreground, #64748B);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-xs, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast, 150ms ease);
+  text-decoration: none;
+}
+
+.actionBtn:hover,
+.linkBtn:hover {
+  color: var(--color-foreground, #F8FAFC);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.actionBtn.danger:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Inline Edit */
+.editWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
 .editInput {
-  background: var(--bg-surface);
-  border: 1px solid var(--accent);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
-  padding: 4px 8px;
+  background: var(--color-background, #0B0F19);
+  border: 1px solid var(--color-primary, #3B82F6);
+  border-radius: var(--radius-xs, 6px);
+  color: var(--color-foreground, #F8FAFC);
   font-size: 13px;
+  padding: 3px 7px;
   outline: none;
-  width: 250px;
+  width: 100%;
 }
 
 .saveBtn,
 .cancelBtn {
+  border: none;
+  background: var(--color-muted, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-xs, 6px);
+  cursor: pointer;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: all var(--transition);
+  color: var(--color-foreground, #F8FAFC);
 }
 
 .saveBtn:hover {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+  background: #10B981;
+  color: #FFFFFF;
 }
 
 .cancelBtn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.actionBtn.danger:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: #EF4444;
+  color: #FFFFFF;
 }
 
 .spinning {
@@ -225,7 +389,10 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

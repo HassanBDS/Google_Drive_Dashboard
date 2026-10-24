@@ -292,6 +292,30 @@ function DriveDashboardContent() {
     setSearch("");
   };
 
+  // Global keyboard navigation: Backspace navigates to parent directory
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Backspace") {
+        const target = e.target as HTMLElement | null;
+        const isInput =
+          target?.tagName === "INPUT" ||
+          target?.tagName === "TEXTAREA" ||
+          target?.isContentEditable;
+
+        if (!isInput && data && data.breadcrumbs.length > 1) {
+          e.preventDefault();
+          const parentItem = data.breadcrumbs[data.breadcrumbs.length - 2];
+          if (parentItem) {
+            handleNavigate(parentItem.id);
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [data]);
+
   const handleRefresh = () => fetchFolder(currentFolder || undefined);
   const handleRefreshStats = () => {
     if (!data) return;
@@ -430,6 +454,7 @@ function DriveDashboardContent() {
               activeCheckpoints={activeCheckpoints}
               onStartFolderScan={(folderId) => startFolderScan(folderId, depth + 1)}
               onStopFolderScan={stopFolderScan}
+              parentTotalSize={effectiveDeepStats?.totalSize ?? (totalScannedSize > 0 ? totalScannedSize : undefined)}
             />
 
             <FileTable files={filteredFiles} onRefresh={handleRefresh} />
