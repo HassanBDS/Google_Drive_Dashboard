@@ -1,0 +1,217 @@
+.chartCard {
+  background: var(--bento-card-bg, rgba(17, 25, 42, 0.90));
+  border: var(--bento-card-border, 1px solid var(--color-border, rgba(255, 255, 255, 0.08)));
+  border-radius: var(--bento-card-radius, 20px);
+  padding: 24px;
+  box-shadow: var(--bento-card-shadow, 0 4px 20px rgba(0, 0, 0, 0.2));
+  backdrop-filter: var(--glass-blur, blur(16px));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+  transition: border-color var(--transition, 200ms ease), box-shadow var(--transition, 200ms ease);
+}
+
+.chartCard:hover {
+  box-shadow: var(--bento-card-shadow-hover, 0 8px 30px rgba(37, 99, 235, 0.15));
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titleIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-muted, rgba(59, 130, 246, 0.12));
+  color: var(--color-primary, #3B82F6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTitle {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.cardSubtitle {
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+  margin-top: 2px;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.05));
+  color: var(--color-muted-foreground, #94A3B8);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.treemapContainer {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.treemapSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nodeGroup {
+  cursor: pointer;
+  outline: none;
+  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nodeRect {
+  transition: filter 180ms ease, stroke-width 180ms ease, opacity 180ms ease;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1px;
+}
+
+.nodeGroup:hover .nodeRect,
+.nodeGroup:focus-visible .nodeRect {
+  stroke: #FFFFFF;
+  stroke-width: 2px;
+  filter: brightness(1.12) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+}
+
+.nodeTextName {
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  fill: #FFFFFF;
+  pointer-events: none;
+  user-select: none;
+}
+
+.nodeTextSize {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 500;
+  fill: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Tooltip overlay */
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  white-space: nowrap;
+  animation: fadeIn 150ms ease-out;
+}
+
+.tooltipTitle {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltipDetails {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--color-primary, #60A5FA);
+  margin-top: 2px;
+}
+
+.tooltipHint {
+  font-size: 10px;
+  color: #94A3B8;
+  margin-top: 4px;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  text-align: center;
+  padding: 24px;
+  background: var(--color-muted, rgba(255, 255, 255, 0.02));
+  border-radius: var(--radius-md, 12px);
+  border: 1px dashed var(--color-border, rgba(255, 255, 255, 0.10));
+}
+
+.emptyIcon {
+  color: var(--color-muted-foreground, #64748B);
+  margin-bottom: 10px;
+  opacity: 0.7;
+}
+
+.emptyTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-foreground, #F8FAFC);
+  margin: 0 0 4px;
+}
+
+.emptySubtitle {
+  font-size: 12px;
+  color: var(--color-muted-foreground, #94A3B8);
+  max-width: 340px;
+  margin: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -90%); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
+}
