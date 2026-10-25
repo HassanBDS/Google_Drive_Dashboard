@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, RefreshCw, HardDrive } from "lucide-react";
+import { Search, RefreshCw } from "lucide-react";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   searchValue?: string;
   searchPlaceholder?: string;
   onSearchChange?: (value: string) => void;
+  searchDisabled?: boolean;
   onRefresh?: () => void;
   isLoading?: boolean;
 }
@@ -17,43 +18,32 @@ export default function Header({
   searchValue = "",
   searchPlaceholder = "Search...",
   onSearchChange,
+  searchDisabled = false,
   onRefresh,
   isLoading = false,
 }: HeaderProps) {
   return (
     <header className={styles.header} suppressHydrationWarning>
       <div className={styles.left} suppressHydrationWarning>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "8px",
-              background: "linear-gradient(135deg, var(--color-primary, #2563EB) 0%, #1D4ED8 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 10px var(--accent-glow)",
-            }}
-          >
-            <HardDrive size={18} color="#fff" />
-          </div>
-          <h2 className={styles.pageTitle}>{title}</h2>
-        </div>
-
+        <h2 className={styles.pageTitle}>{title}</h2>
       </div>
 
       <div className={styles.right} suppressHydrationWarning>
         {onSearchChange && (
-          <div className={styles.searchWrap}>
+          <div className={`${styles.searchWrap} ${searchDisabled ? styles.searchWrapDisabled : ""}`}>
             <Search className={styles.searchIcon} />
             <input
               type="text"
-              className={styles.searchInput}
-              placeholder={searchPlaceholder}
-              value={searchValue}
-              onChange={(e) => onSearchChange(e.target.value)}
+              className={`${styles.searchInput} ${searchDisabled ? styles.searchInputDisabled : ""}`}
+              placeholder={searchDisabled ? "Search & filter (Coming soon)" : searchPlaceholder}
+              value={searchDisabled ? "" : searchValue}
+              onChange={(e) => !searchDisabled && onSearchChange(e.target.value)}
+              disabled={searchDisabled}
+              title={searchDisabled ? "Deep global search is coming soon" : undefined}
             />
+            {searchDisabled && (
+              <span className={styles.comingSoonBadge}>Soon</span>
+            )}
           </div>
         )}
 

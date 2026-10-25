@@ -69,6 +69,35 @@
   box-shadow: 0 0 0 3px var(--accent-muted);
 }
 
+.searchWrapDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.searchInputDisabled {
+  cursor: not-allowed;
+  background: var(--bg-surface-elevated, var(--bg-surface));
+  color: var(--text-dim);
+  border-color: var(--border);
+  padding-right: 48px;
+}
+
+.comingSoonBadge {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+
 .refreshBtn {
   display: flex;
   align-items: center;

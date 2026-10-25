@@ -30,6 +30,15 @@ const firaCode = Fira_Code({
 export const metadata: Metadata = {
   title: "Google Drive Dashboard",
   description: "Visual disk usage analyzer and file explorer for Google Drive.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 import { Toaster } from "sonner";

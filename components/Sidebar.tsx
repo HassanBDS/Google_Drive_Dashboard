@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
+import BrandIcon from "@/components/BrandIcon";
+
 const navItems = [
   { label: "Explorer", href: "/", icon: HardDrive },
   { label: "Settings", href: "/settings", icon: Settings },
@@ -68,9 +70,7 @@ export default function Sidebar() {
       {/* Brand Logo */}
       <div className={styles.logoSection}>
         <Link href="/" className={styles.logoLink} title="Google Drive Dashboard">
-          <div className={styles.logoIcon}>
-            <HardDrive size={20} color="#fff" strokeWidth={2.2} />
-          </div>
+          <BrandIcon size={34} />
           {!isCollapsed && (
             <div className={styles.logoText}>
               <h1>Drive Dashboard</h1>

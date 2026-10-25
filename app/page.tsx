@@ -388,6 +388,7 @@ function DriveDashboardContent() {
         searchValue={search}
         searchPlaceholder="Filter files and folders..."
         onSearchChange={setSearch}
+        searchDisabled={true}
         onRefresh={handleRefresh}
         isLoading={loading}
       />
