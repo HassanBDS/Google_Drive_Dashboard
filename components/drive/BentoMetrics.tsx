@@ -70,7 +70,6 @@ export default function BentoMetrics({
   folderStats = {},
   folderScanStates,
   activeCheckpoints = {},
-  onStartScan,
   currentFolderId,
 }: BentoMetricsProps) {
   // 1. Data calculations
@@ -89,6 +88,17 @@ export default function BentoMetrics({
   }, [folderScanStates]);
 
   const isScanning = Boolean(scanningItem);
+
+  const foldersScannedLabel = useMemo(() => {
+    const phase = scanningItem?.phase;
+    if (phase?.startsWith("discovering") || phase === "discovering") {
+      return "Folders Found";
+    }
+    if (phase === "calculating_sizes") {
+      return "Folders Indexed";
+    }
+    return "Folders Scanned";
+  }, [scanningItem?.phase]);
 
   // Scan velocity (folders / sec)
   const scanVelocity = useMemo(() => {
@@ -255,7 +265,7 @@ export default function BentoMetrics({
             {isScanning && (
               <>
                 <div className={styles.telemetryRow}>
-                  <span className={styles.telemetryLabel}>Folders Scanned</span>
+                  <span className={styles.telemetryLabel}>{foldersScannedLabel}</span>
                   <span className={styles.telemetryVal}>
                     {scanningItem?.foldersScanned.toLocaleString()}
                   </span>
@@ -301,18 +311,8 @@ export default function BentoMetrics({
             ) : checkpointCount > 0 ? (
               <div className={styles.checkpointBanner}>
                 <span>
-                  Checkpoint: {firstCheckpoint[1].foldersScanned.toLocaleString()} folders saved
+                  ⏸ Checkpoint saved — {firstCheckpoint[1].foldersScanned.toLocaleString()} folders indexed
                 </span>
-                {onStartScan && (
-                  <button
-                    type="button"
-                    className={styles.checkpointBtn}
-                    onClick={() => onStartScan(firstCheckpoint[0])}
-                    title="Resume scan from saved checkpoint"
-                  >
-                    Resume
-                  </button>
-                )}
               </div>
             ) : null}
           </div>

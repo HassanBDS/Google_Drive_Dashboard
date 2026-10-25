@@ -279,26 +279,9 @@
   padding: 8px 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   font-size: 11px;
   color: #F59E0B;
-}
-
-.checkpointBtn {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs, 6px);
-  background: #F59E0B;
-  color: #0B0F19;
-  border: none;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-}
-
-.checkpointBtn:hover {
-  opacity: 0.9;
 }
 
 /* ── Hygiene Card ────────────────────────────────────────────────────── */
