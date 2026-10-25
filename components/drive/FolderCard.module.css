@@ -161,9 +161,9 @@
 }
 
 .scanningCard {
-  border-color: rgba(59, 130, 246, 0.6);
-  background: rgba(17, 25, 42, 0.95);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.22);
+  border-color: var(--color-scan-border, rgba(59, 130, 246, 0.6));
+  background: var(--color-scan-surface, rgba(17, 25, 42, 0.95));
+  box-shadow: var(--color-scan-glow, 0 0 20px rgba(59, 130, 246, 0.22));
 }
 
 /* Card Header Section */
@@ -421,14 +421,15 @@
 /* Inline scanning ticker */
 .scanInlineProgress {
   font-family: var(--font-mono, monospace);
-  font-size: 10px;
-  color: #60A5FA;
+  font-size: 11px;
+  color: var(--color-scan-text, #3B82F6);
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: var(--radius-xs, 6px);
-  background: rgba(59, 130, 246, 0.1);
+  background: var(--color-scan-surface-muted, rgba(59, 130, 246, 0.1));
+  border: 1px solid var(--color-scan-border, rgba(59, 130, 246, 0.25));
   margin-top: 4px;
 }
 

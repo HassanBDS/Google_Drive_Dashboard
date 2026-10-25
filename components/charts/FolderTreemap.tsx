@@ -25,7 +25,7 @@ export default function FolderTreemap({
   items: explicitItems,
   folders,
   folderStats,
-  title = "Folder Storage Weight",
+  title = "Folder Storage Distribution",
   subtitle = "Proportional disk footprint of top directories",
   onSelectFolder,
   maxItems = 12,
@@ -181,7 +181,7 @@ export default function FolderTreemap({
                   className={styles.nodeGroup}
                   tabIndex={0}
                   role="graphics-symbol"
-                  aria-label={`${node.name}: ${formatBytes(node.size)}, ${node.percentage}% of folder weight`}
+                  aria-label={`${node.name}: ${formatBytes(node.size)}, ${node.percentage}% of scanned volume`}
                   onClick={() => handleClick(node.id)}
                   onMouseMove={(e) => handleMouseMove(e, node)}
                   onFocus={() => {
@@ -268,7 +268,7 @@ export default function FolderTreemap({
                 {hoveredNode.name}
               </div>
               <div className={styles.tooltipDetails}>
-                {formatBytes(hoveredNode.size)} • {hoveredNode.percentage}% weight
+                {formatBytes(hoveredNode.size)} • {hoveredNode.percentage}%
                 {hoveredNode.fileCount !== undefined && ` • ${hoveredNode.fileCount.toLocaleString()} files`}
               </div>
               {onSelectFolder && (
@@ -286,7 +286,7 @@ export default function FolderTreemap({
           <tr>
             <th scope="col">Folder Name</th>
             <th scope="col">Total Size</th>
-            <th scope="col">Relative Weight</th>
+            <th scope="col">Share</th>
           </tr>
         </thead>
         <tbody>
