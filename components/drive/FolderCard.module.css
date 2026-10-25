@@ -166,6 +166,10 @@
   box-shadow: var(--color-scan-glow, 0 0 20px rgba(59, 130, 246, 0.22));
 }
 
+.scanningCard .folderIcon {
+  color: var(--color-scan-text, #3B82F6);
+}
+
 /* Card Header Section */
 .cardTopRow {
   display: flex;
@@ -190,7 +194,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19px;
+  color: var(--color-primary, #2563EB);
   flex-shrink: 0;
   transition: transform 180ms ease;
 }
@@ -520,7 +524,7 @@
 .colIdentity .folderIcon {
   width: 32px;
   height: 32px;
-  font-size: 16px;
+  color: var(--color-primary, #2563EB);
   border-radius: var(--radius-sm, 8px);
 }
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Folder,
+  FolderOpen,
   ArrowRight,
   AlertTriangle,
   RefreshCw,
@@ -312,7 +313,7 @@ export default function FolderCardGrid({
           {/* Column 1: Identity */}
           <div className={styles.colIdentity}>
             <div className={styles.folderIcon} aria-hidden="true">
-              📁
+              {isThisScanning ? <FolderOpen size={20} /> : <Folder size={20} />}
             </div>
             <div className={styles.nameWrap}>
               <div className={styles.nameRow}>
@@ -550,7 +551,7 @@ export default function FolderCardGrid({
         <div className={styles.cardTopRow}>
           <div className={styles.folderLeftGroup}>
             <div className={styles.folderIcon} aria-hidden="true">
-              📁
+              {isThisScanning ? <FolderOpen size={20} /> : <Folder size={20} />}
             </div>
             <div className={styles.nameWrap}>
               <div className={styles.nameRow}>
