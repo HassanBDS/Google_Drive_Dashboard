@@ -11,6 +11,7 @@ import {
   PlayCircle,
   FileBox,
   RefreshCw,
+  Download,
 } from "lucide-react";
 import { formatBytes, formatDate } from "@/lib/utils";
 import { analyzeStorageHygiene, DriveItemMeta, FolderStatMeta } from "@/lib/hygiene-utils";
@@ -286,9 +287,19 @@ export default function BentoMetrics({
                   title="Revalidate cache and reload telemetry"
                 >
                   <RefreshCw size={13} />
-                  <span>Refresh Cache</span>
+                  <span>Refresh</span>
                 </button>
               )}
+              <a
+                href="/api/drive/export-cache"
+                className={styles.telemetryActionBtn}
+                title="Download consolidated scanner cache and storage telemetry as JSON"
+                style={{ textDecoration: "none" }}
+                download
+              >
+                <Download size={13} />
+                <span>Export</span>
+              </a>
               {onStartScan && currentFolderId && (
                 <button
                   type="button"

@@ -266,10 +266,12 @@
   align-items: center;
   gap: 8px;
   margin-top: 6px;
+  flex-wrap: wrap;
 }
 
 .telemetryActionBtn {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 85px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -283,6 +285,7 @@
   border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
   cursor: pointer;
   transition: all 150ms ease;
+  white-space: nowrap;
 }
 
 .telemetryActionBtn:hover:not(:disabled) {

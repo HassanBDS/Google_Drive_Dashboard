@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Loader2,
   FileText,
+  Download,
 } from "lucide-react";
 import styles from "./settings.module.css";
 
@@ -413,6 +414,17 @@ export default function SettingsPage() {
           </div>
 
           <div className={styles.actionsRow}>
+            <a
+              href="/api/drive/export-cache"
+              className={styles.btnSecondary}
+              style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}
+              title="Download consolidated cache file as JSON"
+              download
+            >
+              <Download size={15} />
+              Download Cache Export
+            </a>
+
             <button
               type="button"
               className={styles.btnDanger}
