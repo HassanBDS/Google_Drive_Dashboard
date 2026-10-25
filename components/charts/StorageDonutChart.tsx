@@ -16,6 +16,7 @@ export interface StorageDonutChartProps {
   activeCategory?: MimeCategoryId | null;
   onSelectCategory?: (category: MimeCategoryId | null) => void;
   className?: string;
+  compact?: boolean;
 }
 
 const RADIUS = 85;
@@ -30,6 +31,7 @@ export default function StorageDonutChart({
   activeCategory = null,
   onSelectCategory,
   className = "",
+  compact = false,
 }: StorageDonutChartProps) {
   const chartId = useId();
   const [internalHovered, setInternalHovered] = useState<MimeCategoryId | null>(null);
@@ -96,27 +98,29 @@ export default function StorageDonutChart({
 
   return (
     <section
-      className={`${styles.chartCard} ${className}`}
+      className={`${compact ? styles.chartCardCompact : styles.chartCard} ${className}`}
       role="region"
       aria-labelledby={`${chartId}-title`}
     >
-      <header className={styles.cardHeader}>
-        <div className={styles.titleGroup}>
-          <div className={styles.titleIcon} aria-hidden="true">
-            <PieChart size={18} />
+      {!compact && (
+        <header className={styles.cardHeader}>
+          <div className={styles.titleGroup}>
+            <div className={styles.titleIcon} aria-hidden="true">
+              <PieChart size={18} />
+            </div>
+            <div>
+              <h3 id={`${chartId}-title`} className={styles.cardTitle}>
+                {title}
+              </h3>
+              {subtitle && <p className={styles.cardSubtitle}>{subtitle}</p>}
+            </div>
           </div>
-          <div>
-            <h3 id={`${chartId}-title`} className={styles.cardTitle}>
-              {title}
-            </h3>
-            {subtitle && <p className={styles.cardSubtitle}>{subtitle}</p>}
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <div className={styles.bodyLayout}>
+      <div className={compact ? styles.bodyLayoutCompact : styles.bodyLayout}>
         {/* Donut Chart SVG */}
-        <div className={styles.svgWrapper}>
+        <div className={compact ? styles.svgWrapperCompact : styles.svgWrapper}>
           <svg
             viewBox="0 0 240 240"
             className={styles.donutSvg}
@@ -190,47 +194,49 @@ export default function StorageDonutChart({
           </div>
         </div>
 
-        {/* Responsive Legend */}
-        <div className={styles.legendContainer} role="list" aria-label="Category Legend">
-          {categories.map((cat) => {
-            const isHovered = activeId === cat.id;
-            const isOtherDimmed = activeId !== null && !isHovered;
+        {/* Responsive Legend - hidden in compact mode */}
+        {!compact && (
+          <div className={styles.legendContainer} role="list" aria-label="Category Legend">
+            {categories.map((cat) => {
+              const isHovered = activeId === cat.id;
+              const isOtherDimmed = activeId !== null && !isHovered;
 
-            return (
-              <div
-                key={cat.id}
-                role="listitem"
-                className={`${styles.legendRow} ${isHovered ? styles.legendRowActive : ""} ${
-                  isOtherDimmed ? styles.legendRowDimmed : ""
-                }`}
-                onMouseEnter={() => setInternalHovered(cat.id)}
-                onMouseLeave={() => setInternalHovered(null)}
-                onClick={() => handleSliceClick(cat.id)}
-              >
-                <div className={styles.legendLeft}>
-                  <span
-                    className={styles.colorDot}
-                    style={{ backgroundColor: cat.color }}
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <div className={styles.categoryLabel}>{cat.label}</div>
-                    {cat.count > 0 && (
-                      <div className={styles.categoryCount}>
-                        {cat.count.toLocaleString()} file{cat.count !== 1 ? "s" : ""}
-                      </div>
-                    )}
+              return (
+                <div
+                  key={cat.id}
+                  role="listitem"
+                  className={`${styles.legendRow} ${isHovered ? styles.legendRowActive : ""} ${
+                    isOtherDimmed ? styles.legendRowDimmed : ""
+                  }`}
+                  onMouseEnter={() => setInternalHovered(cat.id)}
+                  onMouseLeave={() => setInternalHovered(null)}
+                  onClick={() => handleSliceClick(cat.id)}
+                >
+                  <div className={styles.legendLeft}>
+                    <span
+                      className={styles.colorDot}
+                      style={{ backgroundColor: cat.color }}
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <div className={styles.categoryLabel}>{cat.label}</div>
+                      {cat.count > 0 && (
+                        <div className={styles.categoryCount}>
+                          {cat.count.toLocaleString()} file{cat.count !== 1 ? "s" : ""}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.legendRight}>
+                    <span className={styles.categorySize}>{formatBytes(cat.bytes)}</span>
+                    <span className={styles.categoryPercent}>{cat.percentage}%</span>
                   </div>
                 </div>
-
-                <div className={styles.legendRight}>
-                  <span className={styles.categorySize}>{formatBytes(cat.bytes)}</span>
-                  <span className={styles.categoryPercent}>{cat.percentage}%</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Screen reader data table fallback for full WCAG compliance */}
