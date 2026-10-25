@@ -120,8 +120,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex: 1;
+  min-height: 0;
 }
 
 .heroMetrics {
@@ -191,13 +192,24 @@
 }
 
 .heroChartMini {
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
+}
+
+.miniChartOverride {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 /* ── Telemetry Card ──────────────────────────────────────────────────── */
@@ -249,39 +261,51 @@
   box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
 }
 
-.activeScanBanner {
-  background: var(--color-scan-surface-muted, rgba(59, 130, 246, 0.1));
-  border: 1px solid var(--color-scan-border, rgba(59, 130, 246, 0.25));
-  border-radius: var(--radius-sm, 8px);
-  padding: 8px 10px;
+.telemetryActions {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
-  color: var(--color-scan-text, #3B82F6);
-  min-height: 34px;
+  margin-top: 6px;
 }
 
-.activeScanPulse {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-primary, #3B82F6);
-  box-shadow: 0 0 8px var(--color-primary, #3B82F6);
-  animation: pulse 1s infinite;
-  flex-shrink: 0;
-}
-
-.checkpointBanner {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  border-radius: var(--radius-sm, 8px);
-  padding: 8px 10px;
-  display: flex;
+.telemetryActionBtn {
+  flex: 1;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
   font-size: 11px;
-  color: #F59E0B;
+  font-weight: 600;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-muted, rgba(255, 255, 255, 0.06));
+  color: var(--color-foreground, #F8FAFC);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.telemetryActionBtn:hover:not(:disabled) {
+  background: var(--color-primary, #2563EB);
+  color: #FFFFFF;
+  border-color: var(--color-primary, #2563EB);
+  transform: translateY(-1px);
+}
+
+.telemetryActionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.telemetryActionBtnPrimary {
+  background: var(--color-primary, #2563EB);
+  color: #FFFFFF;
+  border-color: var(--color-primary, #2563EB);
+}
+
+.telemetryActionBtnPrimary:hover:not(:disabled) {
+  background: #1D4ED8;
+  border-color: #1D4ED8;
 }
 
 /* ── Hygiene Card ────────────────────────────────────────────────────── */

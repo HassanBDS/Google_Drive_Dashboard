@@ -10,6 +10,7 @@ import {
   Clock,
   PlayCircle,
   FileBox,
+  RefreshCw,
 } from "lucide-react";
 import { formatBytes, formatDate } from "@/lib/utils";
 import { analyzeStorageHygiene, DriveItemMeta, FolderStatMeta } from "@/lib/hygiene-utils";
@@ -48,6 +49,7 @@ export interface BentoMetricsProps {
     { startedAt: string; foldersScanned: number; folderName?: string }
   >;
   onStartScan?: (folderId: string) => void;
+  onRefresh?: () => void;
   currentFolderId?: string;
 }
 
@@ -70,6 +72,8 @@ export default function BentoMetrics({
   folderStats = {},
   folderScanStates,
   activeCheckpoints = {},
+  onStartScan,
+  onRefresh,
   currentFolderId,
 }: BentoMetricsProps) {
   // 1. Data calculations
@@ -81,34 +85,12 @@ export default function BentoMetrics({
   const effectiveFolderCount = directFolderCount ?? folderCount;
 
   // 2. Active scanning state
-  const scanningItem = useMemo(() => {
-    if (!folderScanStates) return null;
-    const states = Array.from(folderScanStates.values());
-    return states.find((s) => s.isScanning) || null;
+  const scanningCount = useMemo(() => {
+    if (!folderScanStates) return 0;
+    return Array.from(folderScanStates.values()).filter((s) => s.isScanning).length;
   }, [folderScanStates]);
 
-  const isScanning = Boolean(scanningItem);
-
-  const foldersScannedLabel = useMemo(() => {
-    const phase = scanningItem?.phase;
-    if (phase?.startsWith("discovering") || phase === "discovering") {
-      return "Folders Found";
-    }
-    if (phase === "calculating_sizes") {
-      return "Folders Indexed";
-    }
-    return "Folders Scanned";
-  }, [scanningItem?.phase]);
-
-  // Scan velocity (folders / sec)
-  const scanVelocity = useMemo(() => {
-    if (!scanningItem || !scanningItem.elapsedMs || scanningItem.elapsedMs < 1000) {
-      return null;
-    }
-    const sec = scanningItem.elapsedMs / 1000;
-    const rate = scanningItem.foldersScanned / sec;
-    return `${rate.toFixed(1)} /s`;
-  }, [scanningItem]);
+  const isScanning = scanningCount > 0;
 
   // 3. Active Checkpoints
   const checkpointCount = Object.keys(activeCheckpoints).length;
@@ -218,6 +200,7 @@ export default function BentoMetrics({
                   totalBytes={effectiveSize}
                   title="Storage Types"
                   subtitle=""
+                  compact={true}
                   className={styles.miniChartOverride}
                 />
               </div>
@@ -230,26 +213,24 @@ export default function BentoMetrics({
           <div className={styles.cardHeader}>
             <div className={styles.headerLeft}>
               <div
-                className={`${styles.iconWrap} ${
-                  isScanning
+                className={`${styles.iconWrap} ${isScanning
                     ? styles.iconWrapSuccess
                     : checkpointCount > 0
-                    ? styles.iconWrapAccent
-                    : ""
-                }`}
+                      ? styles.iconWrapAccent
+                      : ""
+                  }`}
               >
                 <Activity size={18} />
               </div>
               <h3 className={styles.cardTitle}>Scan Telemetry</h3>
             </div>
             <span
-              className={`${styles.pulseDot} ${
-                isScanning
+              className={`${styles.pulseDot} ${isScanning
                   ? styles.pulseDotScanning
                   : checkpointCount > 0
-                  ? styles.pulseDotCheckpoint
-                  : ""
-              }`}
+                    ? styles.pulseDotCheckpoint
+                    : ""
+                }`}
               title={isScanning ? "Scan in progress" : "Scanner idle"}
             />
           </div>
@@ -257,27 +238,15 @@ export default function BentoMetrics({
           <div className={styles.telemetryBody}>
             <div className={styles.telemetryRow}>
               <span className={styles.telemetryLabel}>Status</span>
-              <span className={styles.telemetryVal}>
-                {isScanning ? "Active Scanning" : "Idle"}
+              <span
+                className={styles.telemetryVal}
+                style={{ color: isScanning ? "var(--color-primary, #3B82F6)" : undefined }}
+              >
+                {isScanning
+                  ? `Active (${scanningCount} scan${scanningCount !== 1 ? "s" : ""})`
+                  : "Idle"}
               </span>
             </div>
-
-            {isScanning && (
-              <>
-                <div className={styles.telemetryRow}>
-                  <span className={styles.telemetryLabel}>{foldersScannedLabel}</span>
-                  <span className={styles.telemetryVal}>
-                    {scanningItem?.foldersScanned.toLocaleString()}
-                  </span>
-                </div>
-                {scanVelocity && (
-                  <div className={styles.telemetryRow}>
-                    <span className={styles.telemetryLabel}>Scan Velocity</span>
-                    <span className={styles.telemetryVal}>{scanVelocity}</span>
-                  </div>
-                )}
-              </>
-            )}
 
             <div className={styles.telemetryRow}>
               <span className={styles.telemetryLabel}>
@@ -298,23 +267,41 @@ export default function BentoMetrics({
               </span>
             </div>
 
-            {/* Live scanning telemetry indicator OR Checkpoint notification banner */}
-            {isScanning ? (
-              <div className={styles.activeScanBanner}>
-                <span className={styles.activeScanPulse} />
-                <span>
-                  {scanningItem?.currentFolder
-                    ? `Indexing: ${scanningItem.currentFolder}`
-                    : "Live recursive BFS scanning in progress"}
-                </span>
-              </div>
-            ) : checkpointCount > 0 ? (
-              <div className={styles.checkpointBanner}>
-                <span>
-                  ⏸ Checkpoint saved — {firstCheckpoint[1].foldersScanned.toLocaleString()} folders indexed
-                </span>
-              </div>
-            ) : null}
+            <div className={styles.telemetryRow}>
+              <span className={styles.telemetryLabel}>Saved Checkpoints</span>
+              <span className={styles.telemetryVal}>
+                {checkpointCount > 0
+                  ? `${checkpointCount} saved`
+                  : "None"}
+              </span>
+            </div>
+
+            {/* Operational Action Buttons */}
+            <div className={styles.telemetryActions}>
+              {onRefresh && (
+                <button
+                  type="button"
+                  className={styles.telemetryActionBtn}
+                  onClick={onRefresh}
+                  title="Revalidate cache and reload telemetry"
+                >
+                  <RefreshCw size={13} />
+                  <span>Refresh Cache</span>
+                </button>
+              )}
+              {onStartScan && currentFolderId && (
+                <button
+                  type="button"
+                  className={`${styles.telemetryActionBtn} ${styles.telemetryActionBtnPrimary}`}
+                  onClick={() => onStartScan(currentFolderId)}
+                  disabled={isScanning}
+                  title={isScanning ? "Scans running" : "Deep scan current folder"}
+                >
+                  <PlayCircle size={13} />
+                  <span>{isScanning ? "Scanning Active" : "Scan Folder"}</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -323,24 +310,22 @@ export default function BentoMetrics({
           <div className={styles.cardHeader}>
             <div className={styles.headerLeft}>
               <div
-                className={`${styles.iconWrap} ${
-                  hygiene.status === "optimal"
+                className={`${styles.iconWrap} ${hygiene.status === "optimal"
                     ? styles.iconWrapSuccess
                     : styles.iconWrapAccent
-                }`}
+                  }`}
               >
                 <ShieldCheck size={18} />
               </div>
               <h3 className={styles.cardTitle}>Storage Hygiene</h3>
             </div>
             <span
-              className={`${styles.hygieneScoreBadge} ${
-                hygiene.status === "warning"
+              className={`${styles.hygieneScoreBadge} ${hygiene.status === "warning"
                   ? styles.hygieneScoreWarning
                   : hygiene.status === "good"
-                  ? ""
-                  : ""
-              }`}
+                    ? ""
+                    : ""
+                }`}
             >
               {hygiene.score}/100
             </span>
@@ -365,8 +350,8 @@ export default function BentoMetrics({
               <span className={styles.hygieneItemVal}>
                 {hygiene.duplicateCandidatesCount > 0
                   ? `${hygiene.duplicateCandidatesCount} (${formatBytes(
-                      hygiene.duplicateEstimatedBytes
-                    )})`
+                    hygiene.duplicateEstimatedBytes
+                  )})`
                   : "None flagged"}
               </span>
             </div>
@@ -378,8 +363,8 @@ export default function BentoMetrics({
               <span className={styles.hygieneItemVal}>
                 {hygiene.largeFilesCount > 0
                   ? `${hygiene.largeFilesCount} (${formatBytes(
-                      hygiene.largeFilesTotalBytes
-                    )})`
+                    hygiene.largeFilesTotalBytes
+                  )})`
                   : "0 files"}
               </span>
             </div>
