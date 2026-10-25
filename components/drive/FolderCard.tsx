@@ -376,9 +376,11 @@ export default function FolderCardGrid({
               <span className={styles.proportionalSize}>
                 {formatBytes(effectiveFolderSize)}
               </span>
-              <span className={styles.proportionalPercent}>
-                {folderPercent}% weight
-              </span>
+              {folderPercent > 0 && (
+                <span className={styles.proportionalPercent}>
+                  {folderPercent}%
+                </span>
+              )}
             </div>
           </div>
         )}
