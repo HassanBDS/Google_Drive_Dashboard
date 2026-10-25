@@ -98,7 +98,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 28px;
 }
 
@@ -113,8 +113,8 @@
 .card {
   background: var(--bento-card-bg, rgba(17, 25, 42, 0.90));
   border: var(--bento-card-border, 1px solid var(--color-border, rgba(255, 255, 255, 0.08)));
-  border-radius: var(--radius-lg, 16px);
-  padding: 16px 18px;
+  border-radius: 14px;
+  padding: 20px 20px 14px;
   cursor: pointer;
   transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -125,17 +125,17 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 12px;
-  min-height: 140px;
+  gap: 10px;
+  min-height: 160px;
   outline: none;
   backdrop-filter: var(--glass-blur, blur(16px));
-  box-shadow: var(--bento-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--bento-card-shadow, 0 2px 10px rgba(0, 0, 0, 0.12));
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-ring, rgba(59, 130, 246, 0.4));
-  box-shadow: var(--bento-card-shadow-hover, 0 8px 26px rgba(37, 99, 235, 0.18));
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.14);
 }
 
 .card:focus-visible {
@@ -298,7 +298,7 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: auto;
-  padding-top: 8px;
+  padding-top: 10px;
   border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.05));
 }
 
@@ -342,11 +342,26 @@
   color: #EF4444;
 }
 
-/* Inline action buttons */
+/* Inline action buttons — hidden at rest, revealed on card hover */
 .cardActions {
   display: flex;
   align-items: center;
   gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.card:hover .cardActions,
+.card:focus-visible .cardActions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Always-visible when actively editing or scanning */
+.cardActionsAlwaysVisible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .actionBtn {
@@ -577,4 +592,24 @@
 
 @keyframes spin {
   100% { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: border-color 180ms ease, opacity 200ms ease;
+  }
+  .card:hover {
+    transform: none;
+  }
+  .card:hover .cardActions,
+  .card:focus-visible .cardActions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .cardHoverArrow {
+    transition: none;
+  }
+  .folderIcon {
+    transition: none;
+  }
 }

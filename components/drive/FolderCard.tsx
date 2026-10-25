@@ -601,8 +601,7 @@ export default function FolderCardGrid({
               </div>
             </div>
           </div>
-
-          <ArrowRight className={styles.cardHoverArrow} size={15} />
+          {/* No chevron arrow in grid view — actions revealed on hover */}
         </div>
 
         {/* Proportional storage bar */}
@@ -664,7 +663,14 @@ export default function FolderCardGrid({
             ) : null}
           </div>
 
-          <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`${styles.cardActions} ${
+              isThisScanning || editingId === folder.id
+                ? styles.cardActionsAlwaysVisible
+                : ""
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Quick Inspection trigger */}
             {onInspect && (
               <Tooltip content="Inspect details & child folders">
