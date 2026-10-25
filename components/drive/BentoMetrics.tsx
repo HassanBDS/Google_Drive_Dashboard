@@ -288,23 +288,33 @@ export default function BentoMetrics({
               </span>
             </div>
 
-            {/* Checkpoint notification banner */}
-            {checkpointCount > 0 && (
+            {/* Live scanning telemetry indicator OR Checkpoint notification banner */}
+            {isScanning ? (
+              <div className={styles.activeScanBanner}>
+                <span className={styles.activeScanPulse} />
+                <span>
+                  {scanningItem?.currentFolder
+                    ? `Indexing: ${scanningItem.currentFolder}`
+                    : "Live recursive BFS scanning in progress"}
+                </span>
+              </div>
+            ) : checkpointCount > 0 ? (
               <div className={styles.checkpointBanner}>
                 <span>
-                  Checkpoint: {firstCheckpoint[1].foldersScanned} folders saved
+                  Checkpoint: {firstCheckpoint[1].foldersScanned.toLocaleString()} folders saved
                 </span>
                 {onStartScan && (
                   <button
                     type="button"
                     className={styles.checkpointBtn}
                     onClick={() => onStartScan(firstCheckpoint[0])}
+                    title="Resume scan from saved checkpoint"
                   >
                     Resume
                   </button>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 

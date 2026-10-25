@@ -16,6 +16,7 @@
   .bentoGrid {
     grid-template-columns: 1fr 1fr;
   }
+
   .heroCard {
     grid-column: 1 / -1;
   }
@@ -25,6 +26,7 @@
   .bentoGrid {
     grid-template-columns: 1fr;
   }
+
   .heroCard {
     grid-column: auto;
   }
@@ -247,6 +249,29 @@
   box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
 }
 
+.activeScanBanner {
+  background: var(--color-scan-surface-muted, rgba(59, 130, 246, 0.1));
+  border: 1px solid var(--color-scan-border, rgba(59, 130, 246, 0.25));
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-scan-text, #3B82F6);
+  min-height: 34px;
+}
+
+.activeScanPulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary, #3B82F6);
+  box-shadow: 0 0 8px var(--color-primary, #3B82F6);
+  animation: pulse 1s infinite;
+  flex-shrink: 0;
+}
+
 .checkpointBanner {
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.25);
@@ -369,12 +394,25 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.8; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
 }
