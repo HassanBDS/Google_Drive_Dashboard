@@ -31,6 +31,13 @@
   --color-warning:  #D97706;
   --color-error:    #DC2626;
 
+  /* Scanning card theme tokens */
+  --color-scan-surface:       #EFF6FF;
+  --color-scan-surface-muted: rgba(37, 99, 235, 0.08);
+  --color-scan-border:        rgba(37, 99, 235, 0.35);
+  --color-scan-glow:          0 0 16px rgba(37, 99, 235, 0.12);
+  --color-scan-text:          #1E40AF;
+
   /* ── Glassmorphism tokens ───────────────────────────────────────────── */
   --glass-bg:     rgba(255, 255, 255, 0.72);
   --glass-border: rgba(37, 99, 235, 0.12);
@@ -162,6 +169,13 @@
   --color-warning:          #F59E0B;
   --color-error:            #EF4444;
 
+  /* Scanning card theme tokens */
+  --color-scan-surface:       rgba(17, 25, 42, 0.95);
+  --color-scan-surface-muted: rgba(59, 130, 246, 0.15);
+  --color-scan-border:        rgba(59, 130, 246, 0.60);
+  --color-scan-glow:          0 0 20px rgba(59, 130, 246, 0.25);
+  --color-scan-text:          #93C5FD;
+
   /* Glassmorphism */
   --glass-bg:     rgba(17, 25, 42, 0.75);
   --glass-border: rgba(59, 130, 246, 0.18);
@@ -247,6 +261,13 @@
   --color-success:          #10B981;
   --color-warning:          #F59E0B;
   --color-error:            #EF4444;
+
+  /* Scanning card theme tokens */
+  --color-scan-surface:       rgba(30, 41, 59, 0.95);
+  --color-scan-surface-muted: rgba(59, 130, 246, 0.15);
+  --color-scan-border:        rgba(59, 130, 246, 0.50);
+  --color-scan-glow:          0 0 20px rgba(59, 130, 246, 0.20);
+  --color-scan-text:          #93C5FD;
 
   /* Glassmorphism */
   --glass-bg:     rgba(30, 41, 59, 0.78);
@@ -378,14 +399,16 @@ a:hover {
   transition: margin-left var(--transition-slow);
 }
 
+html.sidebar-collapsed .main-area,
+:root.sidebar-collapsed .main-area,
 html:has(.sidebar-collapsed) .main-area {
   margin-left: var(--sidebar-collapsed-width);
 }
 
 .page-content {
   flex: 1;
-  padding: 24px;
-  max-width: 1400px;
+  padding: 24px 32px;
+  max-width: 1440px;
   width: 100%;
   margin: 0 auto;
 }
