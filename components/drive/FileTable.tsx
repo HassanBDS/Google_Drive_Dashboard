@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { formatBytes, formatDate, getFileTypeIcon, getMimeLabel } from "@/lib/utils";
 import { getMimeCategoryId, MIME_CATEGORY_COLORS } from "@/components/charts";
+import { toast } from "sonner";
 import styles from "./FileTable.module.css";
 
 export interface FileItem {
@@ -177,10 +178,11 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
       );
 
       await Promise.all(deletePromises);
+      toast.success(`${selectedIds.size} file${selectedIds.size > 1 ? "s" : ""} moved to trash`);
       setSelectedIds(new Set());
       onRefresh?.();
     } catch (err: any) {
-      alert(err.message || "Failed to delete files");
+      toast.error(err.message || "Failed to delete files");
     } finally {
       setIsBulkDeleting(false);
     }
@@ -201,13 +203,14 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
         body: JSON.stringify({ fileId: id, newName: editName.trim() }),
       });
       if (res.ok) {
+        toast.success("File renamed successfully");
         onRefresh?.();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to rename");
+        toast.error(data.error || "Failed to rename");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(null);
       setEditingId(null);
@@ -225,13 +228,14 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
         body: JSON.stringify({ fileId: id }),
       });
       if (res.ok) {
+        toast.success("File moved to trash");
         onRefresh?.();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to delete");
+        toast.error(data.error || "Failed to delete");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(null);
     }

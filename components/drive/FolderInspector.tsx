@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   FolderTree,
 } from "lucide-react";
+import { toast } from "sonner";
 import { formatBytes, formatDate } from "@/lib/utils";
 import type { FolderStat } from "./FolderCard";
 import styles from "./FolderInspector.module.css";
@@ -191,14 +192,15 @@ export default function FolderInspector({
         body: JSON.stringify({ fileId: folder.id, newName: newName.trim() }),
       });
       if (res.ok) {
+        toast.success("Folder renamed successfully");
         setIsRenaming(false);
         onRefresh?.();
       } else {
         const d = await res.json();
-        alert(d.error || "Failed to rename folder");
+        toast.error(d.error || "Failed to rename folder");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(false);
     }
@@ -217,14 +219,15 @@ export default function FolderInspector({
         body: JSON.stringify({ fileId: folder.id }),
       });
       if (res.ok) {
+        toast.success("Folder moved to trash");
         onClose();
         onRefresh?.();
       } else {
         const d = await res.json();
-        alert(d.error || "Failed to delete folder");
+        toast.error(d.error || "Failed to delete folder");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(false);
     }

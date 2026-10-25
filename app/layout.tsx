@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   description: "Visual disk usage analyzer and file explorer for Google Drive.",
 };
 
+import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/Tooltip";
+
 export default function RootLayout({
   children,
 }: {
@@ -60,12 +63,15 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <div className="app-layout">
-          <Sidebar />
-          <div className="main-area">
-            {children}
+        <TooltipProvider>
+          <div className="app-layout">
+            <Sidebar />
+            <div className="main-area">
+              {children}
+            </div>
           </div>
-        </div>
+          <Toaster richColors closeButton position="bottom-right" />
+        </TooltipProvider>
       </body>
     </html>
   );

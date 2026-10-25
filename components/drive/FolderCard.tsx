@@ -22,6 +22,8 @@ import {
   Eye,
 } from "lucide-react";
 import { detectLanguage, formatBytes } from "@/lib/utils";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { toast } from "sonner";
 import styles from "./FolderCard.module.css";
 import type { FolderScanState } from "@/app/page";
 
@@ -140,13 +142,14 @@ export default function FolderCardGrid({
         body: JSON.stringify({ fileId: id, newName: editName.trim() }),
       });
       if (res.ok) {
+        toast.success(`Renamed to "${editName.trim()}"`);
         onRefresh?.();
       } else {
         const d = await res.json();
-        alert(d.error || "Failed to rename");
+        toast.error(d.error || "Failed to rename folder");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(null);
       setEditingId(null);
@@ -164,13 +167,14 @@ export default function FolderCardGrid({
         body: JSON.stringify({ fileId: id }),
       });
       if (res.ok) {
+        toast.success("Folder moved to trash");
         onRefresh?.();
       } else {
         const d = await res.json();
-        alert(d.error || "Failed to delete");
+        toast.error(d.error || "Failed to delete folder");
       }
     } catch (err: any) {
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setIsUpdating(null);
     }
@@ -420,92 +424,107 @@ export default function FolderCardGrid({
           {/* Column 4: Action Controls */}
           <div className={styles.colActions} onClick={(e) => e.stopPropagation()}>
             {onInspect && (
-              <button
-                type="button"
-                className={styles.actionBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onInspect(folder.id);
-                }}
-                title="Inspect folder details"
-              >
-                <Eye size={13} />
-              </button>
+              <Tooltip content="Inspect details & child folders">
+                <button
+                  type="button"
+                  className={styles.actionBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInspect(folder.id);
+                  }}
+                  aria-label="Inspect folder details"
+                >
+                  <Eye size={13} />
+                </button>
+              </Tooltip>
             )}
 
             {onStartFolderScan && (
               <div>
                 {isThisScanning ? (
-                  <button
-                    type="button"
-                    className={`${styles.quickScanBtn} ${styles.quickScanStop}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStopFolderScan?.(folder.id);
-                    }}
-                    title="Stop & save progress"
-                    disabled={isStopping}
-                  >
-                    {isStopping ? (
-                      <Loader2 size={11} className={styles.spinning} />
-                    ) : (
-                      <Square size={11} />
-                    )}
-                    <span>{isStopping ? "Saving…" : "Stop"}</span>
-                  </button>
+                  <Tooltip content="Stop scanning & save checkpoint">
+                    <button
+                      type="button"
+                      className={`${styles.quickScanBtn} ${styles.quickScanStop}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info("Stopping scan & saving checkpoint...");
+                        onStopFolderScan?.(folder.id);
+                      }}
+                      aria-label="Stop & save progress"
+                      disabled={isStopping}
+                    >
+                      {isStopping ? (
+                        <Loader2 size={11} className={styles.spinning} />
+                      ) : (
+                        <Square size={11} />
+                      )}
+                      <span>{isStopping ? "Saving…" : "Stop"}</span>
+                    </button>
+                  </Tooltip>
                 ) : hasCheckpoint ? (
-                  <button
-                    type="button"
-                    className={`${styles.quickScanBtn} ${styles.quickScanResume}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartFolderScan(folder.id);
-                    }}
-                    title="Resume paused scan"
-                  >
-                    <PlayCircle size={11} />
-                    <span>Resume</span>
-                  </button>
+                  <Tooltip content="Resume scanning from saved checkpoint">
+                    <button
+                      type="button"
+                      className={`${styles.quickScanBtn} ${styles.quickScanResume}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info("Resuming scan...");
+                        onStartFolderScan(folder.id);
+                      }}
+                      aria-label="Resume paused scan"
+                    >
+                      <PlayCircle size={11} />
+                      <span>Resume</span>
+                    </button>
+                  </Tooltip>
                 ) : (
-                  <button
-                    type="button"
-                    className={styles.quickScanBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartFolderScan(folder.id);
-                    }}
-                    title="Quick scan directory size"
-                  >
-                    <RefreshCw size={11} />
-                    <span>Scan</span>
-                  </button>
+                  <Tooltip content="Start deep recursive scan">
+                    <button
+                      type="button"
+                      className={styles.quickScanBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info(`Scanning "${folder.name}"...`);
+                        onStartFolderScan(folder.id);
+                      }}
+                      aria-label="Quick scan directory size"
+                    >
+                      <RefreshCw size={11} />
+                      <span>Scan</span>
+                    </button>
+                  </Tooltip>
                 )}
               </div>
             )}
 
-            <button
-              type="button"
-              className={styles.actionBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                setEditingId(folder.id);
-                setEditName(folder.name);
-              }}
-              title="Rename"
-              disabled={isUpdating === folder.id}
-            >
-              <Pencil size={13} />
-            </button>
+            <Tooltip content="Rename folder">
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingId(folder.id);
+                  setEditName(folder.name);
+                }}
+                aria-label="Rename folder"
+                disabled={isUpdating === folder.id}
+              >
+                <Pencil size={13} />
+              </button>
+            </Tooltip>
 
-            <button
-              type="button"
-              className={`${styles.actionBtn} ${styles.danger}`}
-              onClick={(e) => handleDelete(e, folder.id)}
-              title="Move to trash"
-              disabled={isUpdating === folder.id}
-            >
-              <Trash2 size={13} />
-            </button>
+            <Tooltip content="Move to trash">
+              <button
+                type="button"
+                className={`${styles.actionBtn} ${styles.danger}`}
+                onClick={(e) => handleDelete(e, folder.id)}
+                aria-label="Move folder to trash"
+                disabled={isUpdating === folder.id}
+              >
+                <Trash2 size={13} />
+              </button>
+            </Tooltip>
           </div>
         </div>
       );
@@ -648,95 +667,110 @@ export default function FolderCardGrid({
           <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
             {/* Quick Inspection trigger */}
             {onInspect && (
-              <button
-                type="button"
-                className={styles.actionBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onInspect(folder.id);
-                }}
-                title="Inspect folder details"
-              >
-                <Eye size={13} />
-              </button>
+              <Tooltip content="Inspect details & child folders">
+                <button
+                  type="button"
+                  className={styles.actionBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInspect(folder.id);
+                  }}
+                  aria-label="Inspect folder details"
+                >
+                  <Eye size={13} />
+                </button>
+              </Tooltip>
             )}
 
             {/* Quick Scan Button */}
             {onStartFolderScan && (
               <div>
                 {isThisScanning ? (
-                  <button
-                    type="button"
-                    className={`${styles.quickScanBtn} ${styles.quickScanStop}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStopFolderScan?.(folder.id);
-                    }}
-                    title="Stop & save progress"
-                    disabled={isStopping}
-                  >
-                    {isStopping ? (
-                      <Loader2 size={11} className={styles.spinning} />
-                    ) : (
-                      <Square size={11} />
-                    )}
-                    <span>{isStopping ? "Saving…" : "Stop"}</span>
-                  </button>
+                  <Tooltip content="Stop scanning & save checkpoint">
+                    <button
+                      type="button"
+                      className={`${styles.quickScanBtn} ${styles.quickScanStop}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info("Stopping scan & saving checkpoint...");
+                        onStopFolderScan?.(folder.id);
+                      }}
+                      aria-label="Stop & save progress"
+                      disabled={isStopping}
+                    >
+                      {isStopping ? (
+                        <Loader2 size={11} className={styles.spinning} />
+                      ) : (
+                        <Square size={11} />
+                      )}
+                      <span>{isStopping ? "Saving…" : "Stop"}</span>
+                    </button>
+                  </Tooltip>
                 ) : hasCheckpoint ? (
-                  <button
-                    type="button"
-                    className={`${styles.quickScanBtn} ${styles.quickScanResume}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartFolderScan(folder.id);
-                    }}
-                    title="Resume paused scan"
-                  >
-                    <PlayCircle size={11} />
-                    <span>Resume</span>
-                  </button>
+                  <Tooltip content="Resume scanning from saved checkpoint">
+                    <button
+                      type="button"
+                      className={`${styles.quickScanBtn} ${styles.quickScanResume}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info("Resuming scan...");
+                        onStartFolderScan(folder.id);
+                      }}
+                      aria-label="Resume paused scan"
+                    >
+                      <PlayCircle size={11} />
+                      <span>Resume</span>
+                    </button>
+                  </Tooltip>
                 ) : (
-                  <button
-                    type="button"
-                    className={styles.quickScanBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartFolderScan(folder.id);
-                    }}
-                    title="Quick scan directory size"
-                  >
-                    <RefreshCw size={11} />
-                    <span>Scan</span>
-                  </button>
+                  <Tooltip content="Start deep recursive scan">
+                    <button
+                      type="button"
+                      className={styles.quickScanBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toast.info(`Scanning "${folder.name}"...`);
+                        onStartFolderScan(folder.id);
+                      }}
+                      aria-label="Quick scan directory size"
+                    >
+                      <RefreshCw size={11} />
+                      <span>Scan</span>
+                    </button>
+                  </Tooltip>
                 )}
               </div>
             )}
 
             {/* Rename */}
-            <button
-              type="button"
-              className={styles.actionBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                setEditingId(folder.id);
-                setEditName(folder.name);
-              }}
-              title="Rename"
-              disabled={isUpdating === folder.id}
-            >
-              <Pencil size={13} />
-            </button>
+            <Tooltip content="Rename folder">
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingId(folder.id);
+                  setEditName(folder.name);
+                }}
+                aria-label="Rename folder"
+                disabled={isUpdating === folder.id}
+              >
+                <Pencil size={13} />
+              </button>
+            </Tooltip>
 
             {/* Delete */}
-            <button
-              type="button"
-              className={`${styles.actionBtn} ${styles.danger}`}
-              onClick={(e) => handleDelete(e, folder.id)}
-              title="Move to trash"
-              disabled={isUpdating === folder.id}
-            >
-              <Trash2 size={13} />
-            </button>
+            <Tooltip content="Move to trash">
+              <button
+                type="button"
+                className={`${styles.actionBtn} ${styles.danger}`}
+                onClick={(e) => handleDelete(e, folder.id)}
+                aria-label="Move folder to trash"
+                disabled={isUpdating === folder.id}
+              >
+                <Trash2 size={13} />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -751,66 +785,76 @@ export default function FolderCardGrid({
           <span>Directories</span>
           <span className={styles.folderCountBadge}>{folders.length}</span>
           {onRefreshStats && (
-            <button
-              type="button"
-              className={styles.refreshStatsBtn}
-              onClick={onRefreshStats}
-              title="Refresh counts"
-              disabled={statsLoading}
-            >
-              <RefreshCw
-                size={13}
-                className={statsLoading ? styles.spinning : ""}
-              />
-            </button>
+            <Tooltip content="Refresh folder metrics">
+              <button
+                type="button"
+                className={styles.refreshStatsBtn}
+                onClick={onRefreshStats}
+                aria-label="Refresh folder metrics"
+                disabled={statsLoading}
+              >
+                <RefreshCw
+                  size={13}
+                  className={statsLoading ? styles.spinning : ""}
+                />
+              </button>
+            </Tooltip>
           )}
         </div>
 
         <div className={styles.layoutToggle}>
           {onSortChange && (
             <>
-              <button
-                type="button"
-                className={`${styles.layoutBtn} ${
-                  sortMode === "name-asc" || sortMode === "name-desc"
-                    ? styles.active
-                    : ""
-                }`}
-                onClick={() =>
-                  onSortChange(sortMode === "name-asc" ? "name-desc" : "name-asc")
-                }
-                title={
+              <Tooltip
+                content={
                   sortMode === "name-asc"
                     ? "Sort A→Z (click for Z→A)"
                     : "Sort Z→A (click for A→Z)"
                 }
               >
-                {sortMode === "name-desc" ? (
-                  <ArrowUpZA size={14} />
-                ) : (
-                  <ArrowDownAZ size={14} />
-                )}
-              </button>
-              <button
-                type="button"
-                className={`${styles.layoutBtn} ${
-                  sortMode === "size-desc" ? styles.active : ""
-                }`}
-                onClick={() => onSortChange("size-desc")}
-                title="Sort by size (largest first)"
-              >
-                <HardDrive size={14} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.layoutBtn} ${
-                  sortMode === "count-desc" ? styles.active : ""
-                }`}
-                onClick={() => onSortChange("count-desc")}
-                title="Sort by count (most first)"
-              >
-                <Hash size={14} />
-              </button>
+                <button
+                  type="button"
+                  className={`${styles.layoutBtn} ${
+                    sortMode === "name-asc" || sortMode === "name-desc"
+                      ? styles.active
+                      : ""
+                  }`}
+                  onClick={() =>
+                    onSortChange(sortMode === "name-asc" ? "name-desc" : "name-asc")
+                  }
+                  aria-label="Sort by name"
+                >
+                  {sortMode === "name-desc" ? (
+                    <ArrowUpZA size={14} />
+                  ) : (
+                    <ArrowDownAZ size={14} />
+                  )}
+                </button>
+              </Tooltip>
+              <Tooltip content="Sort by size (largest first)">
+                <button
+                  type="button"
+                  className={`${styles.layoutBtn} ${
+                    sortMode === "size-desc" ? styles.active : ""
+                  }`}
+                  onClick={() => onSortChange("size-desc")}
+                  aria-label="Sort by size (largest first)"
+                >
+                  <HardDrive size={14} />
+                </button>
+              </Tooltip>
+              <Tooltip content="Sort by folder count (most first)">
+                <button
+                  type="button"
+                  className={`${styles.layoutBtn} ${
+                    sortMode === "count-desc" ? styles.active : ""
+                  }`}
+                  onClick={() => onSortChange("count-desc")}
+                  aria-label="Sort by folder count (most first)"
+                >
+                  <Hash size={14} />
+                </button>
+              </Tooltip>
             </>
           )}
 
@@ -823,22 +867,26 @@ export default function FolderCardGrid({
             }}
           />
 
-          <button
-            type="button"
-            className={`${styles.layoutBtn} ${layout === "grid" ? styles.active : ""}`}
-            onClick={() => handleLayoutToggle("grid")}
-            title="Grid view"
-          >
-            <LayoutGrid size={14} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.layoutBtn} ${layout === "list" ? styles.active : ""}`}
-            onClick={() => handleLayoutToggle("list")}
-            title="List view"
-          >
-            <List size={14} />
-          </button>
+          <Tooltip content="Grid view">
+            <button
+              type="button"
+              className={`${styles.layoutBtn} ${layout === "grid" ? styles.active : ""}`}
+              onClick={() => handleLayoutToggle("grid")}
+              aria-label="Grid view"
+            >
+              <LayoutGrid size={14} />
+            </button>
+          </Tooltip>
+          <Tooltip content="List view">
+            <button
+              type="button"
+              className={`${styles.layoutBtn} ${layout === "list" ? styles.active : ""}`}
+              onClick={() => handleLayoutToggle("list")}
+              aria-label="List view"
+            >
+              <List size={14} />
+            </button>
+          </Tooltip>
         </div>
       </div>
 
