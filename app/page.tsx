@@ -111,9 +111,12 @@ function DriveDashboardContent() {
     }
   }, []);
 
-  const fetchDeepScanCache = useCallback(async () => {
+  const fetchDeepScanCache = useCallback(async (validFolderIds?: string[]) => {
     try {
-      const res = await fetch("/api/drive/deep-scan?flat=true");
+      const url = validFolderIds && validFolderIds.length > 0
+        ? `/api/drive/deep-scan?flat=true&reconcile=${encodeURIComponent(validFolderIds.join(","))}`
+        : "/api/drive/deep-scan?flat=true";
+      const res = await fetch(url);
       const result: DeepScanCacheResponse = await res.json();
       setDeepScanData(result);
       setActiveCheckpoints(result.activeCheckpoints ?? {});
@@ -266,6 +269,12 @@ function DriveDashboardContent() {
       if (listData.folders.length > 0) {
         fetchBulkStats(listData.folders.map((f) => f.id));
       }
+
+      if (!folderId && listData.folders.length > 0) {
+        fetchDeepScanCache(listData.folders.map((f) => f.id));
+      } else {
+        fetchDeepScanCache();
+      }
     } catch (err: any) {
       const msg = err instanceof Error ? err.message : "Failed to load Google Drive folder";
       setError(msg);
@@ -276,7 +285,7 @@ function DriveDashboardContent() {
     } finally {
       setLoading(false);
     }
-  }, [fetchBulkStats]);
+  }, [fetchBulkStats, fetchDeepScanCache]);
 
   useEffect(() => {
     checkConfig().then((configured) => {

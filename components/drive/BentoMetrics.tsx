@@ -104,7 +104,7 @@ export default function BentoMetrics({
   // Scanned progress percent
   const scanProgressPercent = useMemo(() => {
     if (totalLocalesCount > 0 && scannedLocalesCount > 0) {
-      return Math.min(100, Math.round((scannedLocalesCount / totalLocalesCount) * 100));
+      return Math.min(100, Math.round((Math.min(scannedLocalesCount, totalLocalesCount) / totalLocalesCount) * 100));
     }
     return depth > 0 && effectiveSize > 0 ? 100 : 0;
   }, [scannedLocalesCount, totalLocalesCount, depth, effectiveSize]);
@@ -168,7 +168,7 @@ export default function BentoMetrics({
               <div className={styles.heroSubtitle}>
                 {depth === 0
                   ? scannedLocalesCount > 0
-                    ? `${scannedLocalesCount} of ${totalLocalesCount || folderCount} top-level directories scanned`
+                    ? `${Math.min(scannedLocalesCount, totalLocalesCount || folderCount)} of ${totalLocalesCount || folderCount} top-level directories scanned`
                     : "Scan directories to calculate deep recursive storage usage"
                   : `${effectiveFolderCount.toLocaleString()} folder${effectiveFolderCount !== 1 ? "s" : ""}, ${effectiveFileCount.toLocaleString()} file${effectiveFileCount !== 1 ? "s" : ""}`}
               </div>

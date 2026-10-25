@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   readFolderSizeCache,
   readMasterIndex,
+  rebuildMasterIndex,
+  reconcileCache,
   isSizeCacheStale,
   runFolderScan,
   buildFlatSizeMap,
@@ -16,9 +18,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const folderId = searchParams.get("folderId") || null;
     const flat = searchParams.get("flat") === "true";
+    const reconcileParam = searchParams.get("reconcile");
 
     const activeCheckpoints = getActiveCheckpoints();
-    const index = readMasterIndex();
+    
+    let index = readMasterIndex();
+    if (reconcileParam) {
+      const validIds = reconcileParam.split(",").filter(Boolean);
+      if (validIds.length > 0) {
+        index = reconcileCache(validIds);
+      }
+    } else if (!index) {
+      index = rebuildMasterIndex();
+    }
 
     if (flat) {
       const flatMap = buildFlatSizeMap(folderId || undefined);
@@ -89,6 +101,16 @@ export async function POST(request: NextRequest) {
     const initialDepth: number = body.initialDepth ?? 1;
 
     const scanKey = folderId || "root";
+
+    if (action === "reconcile") {
+      const validFolderIds: string[] = body.validFolderIds ?? [];
+      const updatedIndex = reconcileCache(validFolderIds);
+      return NextResponse.json({
+        status: "reconciled",
+        locales: updatedIndex.locales,
+        updatedAt: updatedIndex.updatedAt,
+      });
+    }
 
     if (action === "stop") {
       const scan = activeScanMap.get(scanKey);

@@ -156,6 +156,44 @@ export function rebuildMasterIndex(): MasterIndex {
   return index;
 }
 
+export function deleteFolderSizeCache(folderId: string): void {
+  try {
+    const cp = cacheFilePath(folderId);
+    if (fs.existsSync(cp)) fs.unlinkSync(cp);
+    const chk = checkpointFilePath(folderId);
+    if (fs.existsSync(chk)) fs.unlinkSync(chk);
+    rebuildMasterIndex();
+  } catch (err) {
+    console.error(`[cache] Failed to delete cache for folder ${folderId}:`, err);
+  }
+}
+
+export function reconcileCache(validFolderIds: string[]): MasterIndex {
+  const dir = cacheDir();
+  if (fs.existsSync(dir) && Array.isArray(validFolderIds) && validFolderIds.length > 0) {
+    const validSet = new Set(validFolderIds);
+    const files = fs.readdirSync(dir);
+    for (const f of files) {
+      if (f === "index.json" || f.endsWith(".backup.json") || f === ".gitkeep") continue;
+      if (f.endsWith("-checkpoint.json")) {
+        const id = f.replace("-checkpoint.json", "");
+        if (!validSet.has(id)) {
+          try { fs.unlinkSync(path.join(dir, f)); } catch {}
+        }
+        continue;
+      }
+      if (f.endsWith(".json")) {
+        const id = f.replace(".json", "");
+        if (!validSet.has(id)) {
+          try { fs.unlinkSync(path.join(dir, f)); } catch {}
+        }
+      }
+    }
+  }
+  return rebuildMasterIndex();
+}
+
+
 export function buildFlatSizeMap(
   folderId?: string
 ): Record<string, { totalSize: number; totalFileCount: number; totalFolderCount: number; folderCount: number }> {
