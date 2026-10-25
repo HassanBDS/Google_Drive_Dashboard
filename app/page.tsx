@@ -432,6 +432,7 @@ function DriveDashboardContent() {
               folderScanStates={folderScanStates}
               activeCheckpoints={activeCheckpoints}
               onStartScan={(folderId) => startFolderScan(folderId, depth + 1)}
+              onRefresh={handleRefresh}
               currentFolderId={currentFolder || undefined}
             />
 

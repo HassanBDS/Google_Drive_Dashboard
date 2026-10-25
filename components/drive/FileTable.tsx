@@ -67,7 +67,7 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
       const rawSize = parseInt(f.size, 10);
       const size = isNaN(rawSize) ? 0 : rawSize;
 
-      if (cat === "video" || cat === "audio") media++;
+      if (cat === "video" || cat === "audio" || cat === "image") media++;
       if (cat === "document") documents++;
       if (cat === "archive") archives++;
       if (size >= 100 * 1024 * 1024) large++;
@@ -85,7 +85,7 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
       const rawSize = parseInt(f.size, 10);
       const size = isNaN(rawSize) ? 0 : rawSize;
 
-      if (filterMode === "media") return cat === "video" || cat === "audio";
+      if (filterMode === "media") return cat === "video" || cat === "audio" || cat === "image";
       if (filterMode === "documents") return cat === "document";
       if (filterMode === "archives") return cat === "archive";
       if (filterMode === "large") return size >= 100 * 1024 * 1024;
