@@ -288,6 +288,229 @@ export default function FolderCardGrid({
         ? Math.min(100, Math.round((effectiveFolderSize / maxFolderSize) * 100))
         : 0;
 
+    if (layout === "list") {
+      return (
+        <div
+          key={folder.id}
+          ref={(el) => {
+            cardRefs.current[i] = el;
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label={`Folder: ${folder.name}, ${effectiveFolderSize > 0 ? formatBytes(effectiveFolderSize) : "size uncalculated"}`}
+          className={`${styles.card} ${styles.listCard} ${
+            warning ? styles[`warn_${warning.level}`] : ""
+          } ${isThisScanning ? styles.scanningCard : ""} fade-in`}
+          style={{ animationDelay: `${i * 20}ms` }}
+          onClick={() => onOpen(folder.id)}
+          onKeyDown={(e) => handleCardKeyDown(e, i, folder.id)}
+        >
+          {/* Column 1: Identity */}
+          <div className={styles.colIdentity}>
+            <div className={styles.folderIcon} aria-hidden="true">
+              📁
+            </div>
+            <div className={styles.nameWrap}>
+              <div className={styles.nameRow}>
+                {editingId === folder.id ? (
+                  <div className={styles.editWrap} onClick={(e) => e.stopPropagation()}>
+                    <input
+                      autoFocus
+                      className={styles.editInput}
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleRename(e, folder.id, folder.name);
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                    />
+                    <button
+                      className={styles.saveBtn}
+                      onClick={(e) => handleRename(e, folder.id, folder.name)}
+                      disabled={isUpdating === folder.id}
+                    >
+                      {isUpdating === folder.id ? (
+                        <Loader2 size={12} className={styles.spinning} />
+                      ) : (
+                        <Check size={12} />
+                      )}
+                    </button>
+                    <button
+                      className={styles.cancelBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingId(null);
+                      }}
+                      disabled={isUpdating === folder.id}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className={styles.name} title={folder.name}>
+                      {lang ? lang.label : folder.name}
+                    </div>
+                    {lang && (
+                      <span className={styles.langBadge}>{lang.code}</span>
+                    )}
+                    {warning && (
+                      <span className={`${styles.warningBadge} ${styles[warning.level]}`}>
+                        <AlertTriangle size={10} />
+                        {warning.label}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Volume / Scan Progress (Strictly 200px slot) */}
+          <div className={styles.colMetric}>
+            {isThisScanning && scanState ? (
+              <div className={styles.scanInlineProgress}>
+                <div className={styles.scanInlinePhase}>
+                  {scanState.phase === "resuming"
+                    ? "▶ Resuming…"
+                    : scanState.phase === "calculating_sizes"
+                    ? `💾 ${scanState.foldersScanned.toLocaleString()} folders`
+                    : "📂 Discovering…"}
+                </div>
+                <div className={styles.scanInlineFolder} title={scanState.currentFolder}>
+                  {scanState.currentFolder}
+                </div>
+              </div>
+            ) : effectiveFolderSize > 0 ? (
+              <div className={styles.proportionalBarWrap}>
+                <div className={styles.proportionalBar}>
+                  <div
+                    className={styles.proportionalFill}
+                    style={{ width: `${Math.max(6, folderPercent)}%` }}
+                  />
+                </div>
+                <div className={styles.proportionalLabels}>
+                  <span className={styles.proportionalSize}>
+                    {formatBytes(effectiveFolderSize)}
+                  </span>
+                  {folderPercent > 0 && (
+                    <span className={styles.proportionalPercent}>
+                      {folderPercent}%
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.colMetricPlaceholder} />
+            )}
+          </div>
+
+          {/* Column 3: Folder Count */}
+          <div className={styles.colCount}>
+            {statsLoading && !stats ? (
+              <span className={styles.statChip}>counting…</span>
+            ) : stats && (stats.directFolderCount ?? stats.folderCount) > 0 ? (
+              <span className={styles.statChip}>
+                <Folder size={11} />{" "}
+                {(stats.directFolderCount ?? stats.folderCount).toLocaleString()}
+              </span>
+            ) : null}
+          </div>
+
+          {/* Column 4: Action Controls */}
+          <div className={styles.colActions} onClick={(e) => e.stopPropagation()}>
+            {onInspect && (
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInspect(folder.id);
+                }}
+                title="Inspect folder details"
+              >
+                <Eye size={13} />
+              </button>
+            )}
+
+            {onStartFolderScan && (
+              <div>
+                {isThisScanning ? (
+                  <button
+                    type="button"
+                    className={`${styles.quickScanBtn} ${styles.quickScanStop}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStopFolderScan?.(folder.id);
+                    }}
+                    title="Stop & save progress"
+                    disabled={isStopping}
+                  >
+                    {isStopping ? (
+                      <Loader2 size={11} className={styles.spinning} />
+                    ) : (
+                      <Square size={11} />
+                    )}
+                    <span>{isStopping ? "Saving…" : "Stop"}</span>
+                  </button>
+                ) : hasCheckpoint ? (
+                  <button
+                    type="button"
+                    className={`${styles.quickScanBtn} ${styles.quickScanResume}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStartFolderScan(folder.id);
+                    }}
+                    title="Resume paused scan"
+                  >
+                    <PlayCircle size={11} />
+                    <span>Resume</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.quickScanBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStartFolderScan(folder.id);
+                    }}
+                    title="Quick scan directory size"
+                  >
+                    <RefreshCw size={11} />
+                    <span>Scan</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingId(folder.id);
+                setEditName(folder.name);
+              }}
+              title="Rename"
+              disabled={isUpdating === folder.id}
+            >
+              <Pencil size={13} />
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.actionBtn} ${styles.danger}`}
+              onClick={(e) => handleDelete(e, folder.id)}
+              title="Move to trash"
+              disabled={isUpdating === folder.id}
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         key={folder.id}
