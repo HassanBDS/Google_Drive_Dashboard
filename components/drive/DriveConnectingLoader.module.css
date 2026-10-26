@@ -1,0 +1,411 @@
+/* ── Google Drive Connecting Loader Styles ──────────────────────────── */
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 20px;
+  width: 100%;
+  min-height: 380px;
+  box-sizing: border-box;
+}
+
+.compactContainer {
+  padding: 28px 16px;
+  min-height: auto;
+}
+
+/* ── Glassmorphic card container ────────────────────────────────────── */
+.loaderCard {
+  position: relative;
+  max-width: 480px;
+  width: 100%;
+  padding: 44px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+
+  /* Default / Light Mode */
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 252, 0.90) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 20px 48px -10px rgba(37, 99, 235, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Dim Mode — Slate Blue */
+:global([data-theme="dim"]) .loaderCard,
+:global(:root[data-theme="dim"]) .loaderCard {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.26);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.40),
+    0 24px 60px -12px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 32px rgba(59, 130, 246, 0.10);
+}
+
+/* Dark Mode — Obsidian */
+:global([data-theme="dark"]) .loaderCard,
+:global(:root[data-theme="dark"]) .loaderCard {
+  background: linear-gradient(145deg, rgba(17, 25, 42, 0.90) 0%, rgba(11, 15, 25, 0.86) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.65),
+    0 28px 70px -12px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 36px rgba(59, 130, 246, 0.12);
+}
+
+/* ── Ambient colorful aura behind badge ────────────────────────────── */
+.ambientBackdrop {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ambientBreathing 4.5s ease-in-out infinite alternate;
+  z-index: 0;
+
+  /* Default / Light Mode */
+  background: radial-gradient(
+    circle,
+    rgba(66, 133, 244, 0.20) 0%,
+    rgba(15, 157, 88, 0.15) 35%,
+    rgba(244, 180, 0, 0.12) 65%,
+    rgba(234, 67, 53, 0.08) 85%,
+    transparent 100%
+  );
+  filter: blur(34px);
+}
+
+:global([data-theme="dim"]) .ambientBackdrop,
+:global(:root[data-theme="dim"]) .ambientBackdrop {
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.35) 0%,
+    rgba(16, 185, 129, 0.26) 35%,
+    rgba(245, 158, 11, 0.22) 65%,
+    rgba(239, 68, 68, 0.16) 85%,
+    transparent 100%
+  );
+  filter: blur(38px);
+}
+
+:global([data-theme="dark"]) .ambientBackdrop,
+:global(:root[data-theme="dark"]) .ambientBackdrop {
+  background: radial-gradient(
+    circle,
+    rgba(66, 133, 244, 0.38) 0%,
+    rgba(15, 157, 88, 0.28) 35%,
+    rgba(244, 180, 0, 0.24) 65%,
+    rgba(234, 67, 53, 0.18) 85%,
+    transparent 100%
+  );
+  filter: blur(42px);
+}
+
+@keyframes ambientBreathing {
+  0% {
+    transform: translateX(-50%) scale(0.92);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.15) rotate(10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(0.98) rotate(-10deg);
+    opacity: 0.8;
+  }
+}
+
+/* ── Icon stage ─────────────────────────────────────────────────────── */
+.iconStage {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  z-index: 1;
+}
+
+/* Orbital spinning accent ring */
+.orbitalRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 96px;
+  height: 96px;
+  animation: orbitalSpin 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes orbitalSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Vector SVG brand emblem */
+.driveLogo {
+  width: 72px;
+  height: 64px;
+  display: block;
+  animation: driveFloating 3.2s ease-in-out infinite alternate;
+  transform-origin: center center;
+  filter: drop-shadow(0 4px 14px rgba(37, 99, 235, 0.22));
+}
+
+@keyframes driveFloating {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.035);
+  }
+  100% {
+    transform: translateY(1px) scale(0.99);
+  }
+}
+
+/* ── Typography & Text Section ──────────────────────────────────────── */
+.textSection {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Default / Light Mode */
+  color: #0F172A;
+}
+
+:global([data-theme="dim"]) .title,
+:global(:root[data-theme="dim"]) .title {
+  color: #F8FAFC;
+}
+
+:global([data-theme="dark"]) .title,
+:global(:root[data-theme="dark"]) .title {
+  color: #FFFFFF;
+}
+
+/* ── Sleek animated dots ────────────────────────────────────────────── */
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+
+  /* Default / Light */
+  color: #2563EB;
+}
+
+:global([data-theme="dim"]) .dots,
+:global(:root[data-theme="dim"]) .dots {
+  color: #60A5FA;
+}
+
+:global([data-theme="dark"]) .dots,
+:global(:root[data-theme="dark"]) .dots {
+  color: #38BDF8;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.25;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: translateY(0) scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.15);
+  }
+}
+
+/* ── Indeterminate brand progress bar ───────────────────────────────── */
+.progressTrack {
+  position: relative;
+  width: 230px;
+  height: 5px;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 18px 0 16px;
+
+  /* Default / Light Mode */
+  background: rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+:global([data-theme="dim"]) .progressTrack,
+:global(:root[data-theme="dim"]) .progressTrack {
+  background: rgba(15, 23, 42, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+:global([data-theme="dark"]) .progressTrack,
+:global(:root[data-theme="dark"]) .progressTrack {
+  background: rgba(0, 0, 0, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 45%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    #4285F4 0%,
+    #0F9D58 35%,
+    #F4B400 70%,
+    #EA4335 100%
+  );
+  box-shadow: 0 0 10px rgba(66, 133, 244, 0.45);
+  animation: brandProgress 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes brandProgress {
+  0% {
+    left: -45%;
+    width: 25%;
+  }
+  50% {
+    left: 30%;
+    width: 55%;
+  }
+  100% {
+    left: 105%;
+    width: 30%;
+  }
+}
+
+/* ── Dynamic status feedback ────────────────────────────────────────── */
+.statusMessage {
+  font-family: var(--font-body), 'Inter', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin: 0;
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+
+  /* Default / Light Mode */
+  color: #475569;
+}
+
+:global([data-theme="dim"]) .statusMessage,
+:global(:root[data-theme="dim"]) .statusMessage {
+  color: #CBD5E1;
+}
+
+:global([data-theme="dark"]) .statusMessage,
+:global(:root[data-theme="dark"]) .statusMessage {
+  color: #94A3B8;
+}
+
+.statusLiveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: liveBlink 1.8s ease-in-out infinite;
+
+  /* Default / Light Mode */
+  background: #059669;
+  box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
+}
+
+:global([data-theme="dim"]) .statusLiveDot,
+:global(:root[data-theme="dim"]) .statusLiveDot {
+  background: #10B981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+}
+
+:global([data-theme="dark"]) .statusLiveDot,
+:global(:root[data-theme="dark"]) .statusLiveDot {
+  background: #10B981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+@keyframes liveBlink {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* ── Accessibility / Reduced Motion ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .driveLogo,
+  .orbitalRing,
+  .ambientBackdrop,
+  .progressBar,
+  .statusLiveDot,
+  .dot {
+    animation: none !important;
+  }
+  .progressBar {
+    width: 65%;
+    left: 17%;
+  }
+}

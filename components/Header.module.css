@@ -98,34 +98,6 @@
   letter-spacing: 0.02em;
 }
 
-.refreshBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.refreshBtn:hover {
-  color: var(--text-primary);
-  border-color: var(--border-hover);
-  background: var(--bg-card-hover);
-}
-
-.spinning {
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 @media (max-width: 768px) {
   .header {

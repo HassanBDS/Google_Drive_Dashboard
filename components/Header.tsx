@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, RefreshCw } from "lucide-react";
+import { Search } from "lucide-react";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -19,8 +19,6 @@ export default function Header({
   searchPlaceholder = "Search...",
   onSearchChange,
   searchDisabled = false,
-  onRefresh,
-  isLoading = false,
 }: HeaderProps) {
   return (
     <header className={styles.header} suppressHydrationWarning>
@@ -42,17 +40,6 @@ export default function Header({
               title={searchDisabled ? "Deep global search is coming soon" : undefined}
             />
           </div>
-        )}
-
-        {onRefresh && (
-          <button
-            className={styles.refreshBtn}
-            onClick={onRefresh}
-            title="Refresh"
-            disabled={isLoading}
-          >
-            <RefreshCw size={16} className={isLoading ? styles.spinning : ""} />
-          </button>
         )}
       </div>
     </header>

@@ -8,6 +8,7 @@ import FolderCardGrid, { FolderStat, SortMode } from "@/components/drive/FolderC
 import FileTable from "@/components/drive/FileTable";
 import FolderInspector from "@/components/drive/FolderInspector";
 import ScanProgressPanel from "@/components/drive/ScanProgressPanel";
+import DriveConnectingLoader from "@/components/drive/DriveConnectingLoader";
 import OnboardingWizard from "@/components/setup/OnboardingWizard";
 import styles from "./drive.module.css";
 
@@ -389,8 +390,6 @@ function DriveDashboardContent() {
         searchPlaceholder="Filter files and folders..."
         onSearchChange={setSearch}
         searchDisabled={true}
-        onRefresh={handleRefresh}
-        isLoading={loading}
       />
 
       <div className="page-content" style={{ maxWidth: "1400px", margin: "0 auto", padding: "24px 32px", width: "100%" }}>
@@ -412,10 +411,7 @@ function DriveDashboardContent() {
         )}
 
         {loading && !data && (
-          <div className={styles.driveLoader}>
-            <div className={styles.spinner} />
-            <div className={styles.loaderText}>Connecting to Google Drive...</div>
-          </div>
+          <DriveConnectingLoader />
         )}
 
         {data && (
