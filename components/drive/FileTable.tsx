@@ -5,11 +5,6 @@ import {
   FileText,
   ExternalLink,
   Download,
-  Pencil,
-  Trash2,
-  X,
-  Check,
-  Loader2,
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
@@ -17,7 +12,6 @@ import {
 } from "lucide-react";
 import { formatBytes, formatDate, getFileTypeIcon, getMimeLabel } from "@/lib/utils";
 import { getMimeCategoryId, MIME_CATEGORY_COLORS } from "@/components/charts";
-import { toast } from "sonner";
 import styles from "./FileTable.module.css";
 
 export interface FileItem {
@@ -40,20 +34,12 @@ export interface FileTableProps {
 }
 
 export default function FileTable({ files, onRefresh }: FileTableProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [isUpdating, setIsUpdating] = useState<string | null>(null);
-
   // Sorting state
   const [sortField, setSortField] = useState<FileSortField>("name");
   const [sortDirection, setSortDirection] = useState<FileSortDirection>("asc");
 
   // Filtering state
   const [filterMode, setFilterMode] = useState<FileQuickFilter>("all");
-
-  // Bulk selection state
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Filter counts
   const filterCounts = useMemo(() => {
@@ -136,114 +122,6 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
     }
   };
 
-  // Selection handlers
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(new Set(sortedFiles.map((f) => f.id)));
-    } else {
-      setSelectedIds(new Set());
-    }
-  };
-
-  const handleSelectRow = (id: string, checked: boolean) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  };
-
-  // Bulk deletion
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return;
-    if (
-      !confirm(
-        `Are you sure you want to move ${selectedIds.size} file${
-          selectedIds.size !== 1 ? "s" : ""
-        } to trash?`
-      )
-    ) {
-      return;
-    }
-
-    setIsBulkDeleting(true);
-    try {
-      const deletePromises = Array.from(selectedIds).map((id) =>
-        fetch("/api/drive/delete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fileId: id }),
-        })
-      );
-
-      await Promise.all(deletePromises);
-      toast.success(`${selectedIds.size} file${selectedIds.size > 1 ? "s" : ""} moved to trash`);
-      setSelectedIds(new Set());
-      onRefresh?.();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete files");
-    } finally {
-      setIsBulkDeleting(false);
-    }
-  };
-
-  // Single file operations
-  const handleRename = async (id: string, oldName: string) => {
-    if (editName === oldName || !editName.trim()) {
-      setEditingId(null);
-      return;
-    }
-
-    setIsUpdating(id);
-    try {
-      const res = await fetch("/api/drive/rename", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: id, newName: editName.trim() }),
-      });
-      if (res.ok) {
-        toast.success("File renamed successfully");
-        onRefresh?.();
-      } else {
-        const data = await res.json();
-        toast.error(data.error || "Failed to rename");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(null);
-      setEditingId(null);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to move this file to trash?")) return;
-
-    setIsUpdating(id);
-    try {
-      const res = await fetch("/api/drive/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: id }),
-      });
-      if (res.ok) {
-        toast.success("File moved to trash");
-        onRefresh?.();
-      } else {
-        const data = await res.json();
-        toast.error(data.error || "Failed to delete");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(null);
-    }
-  };
-
-  const allSelected =
-    sortedFiles.length > 0 && selectedIds.size === sortedFiles.length;
-
   return (
     <div className={styles.wrapper}>
       {/* Header bar with title & filter pills */}
@@ -304,54 +182,11 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
         </div>
       </div>
 
-      {/* Bulk actions banner */}
-      {selectedIds.size > 0 && (
-        <div className={styles.bulkBar}>
-          <div className={styles.bulkInfo}>
-            <span>
-              {selectedIds.size} file{selectedIds.size !== 1 ? "s" : ""} selected
-            </span>
-          </div>
-          <div className={styles.bulkActions}>
-            <button
-              type="button"
-              className={styles.bulkDeleteBtn}
-              onClick={handleBulkDelete}
-              disabled={isBulkDeleting}
-            >
-              {isBulkDeleting ? (
-                <Loader2 size={13} className={styles.spinning} />
-              ) : (
-                <Trash2 size={13} />
-              )}
-              <span>Move to Trash</span>
-            </button>
-            <button
-              type="button"
-              className={styles.bulkCancelBtn}
-              onClick={() => setSelectedIds(new Set())}
-            >
-              Deselect All
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Main Table */}
       <div className={styles.tableWrap}>
         <table className={styles.table}>
           <thead className={styles.thead}>
             <tr>
-              <th className={styles.checkboxTh}>
-                <input
-                  type="checkbox"
-                  className={styles.checkbox}
-                  checked={allSelected}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  aria-label="Select all files"
-                />
-              </th>
-
               {/* Name column */}
               <th
                 className={styles.sortableTh}
@@ -425,73 +260,23 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
 
           <tbody className={styles.tbody}>
             {sortedFiles.map((file, i) => {
-              const isSelected = selectedIds.has(file.id);
               const catId = getMimeCategoryId(file.mimeType);
               const catInfo = MIME_CATEGORY_COLORS[catId];
 
               return (
                 <tr
                   key={file.id}
-                  className={`${styles.row} ${isSelected ? styles.rowSelected : ""} fade-in`}
+                  className={`${styles.row} fade-in`}
                   style={{ animationDelay: `${i * 15}ms` }}
                 >
-                  <td className={styles.checkboxCell}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={isSelected}
-                      onChange={(e) => handleSelectRow(file.id, e.target.checked)}
-                      aria-label={`Select ${file.name}`}
-                    />
-                  </td>
-
                   {/* Name */}
                   <td className={styles.nameCell}>
                     <span className={styles.fileIcon} aria-hidden="true">
                       {getFileTypeIcon(file.mimeType)}
                     </span>
-
-                    {editingId === file.id ? (
-                      <div
-                        className={styles.editWrap}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <input
-                          autoFocus
-                          className={styles.editInput}
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleRename(file.id, file.name);
-                            if (e.key === "Escape") setEditingId(null);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className={styles.saveBtn}
-                          onClick={() => handleRename(file.id, file.name)}
-                          disabled={isUpdating === file.id}
-                        >
-                          {isUpdating === file.id ? (
-                            <Loader2 size={12} className={styles.spinning} />
-                          ) : (
-                            <Check size={12} />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.cancelBtn}
-                          onClick={() => setEditingId(null)}
-                          disabled={isUpdating === file.id}
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ) : (
-                      <span className={styles.fileName} title={file.name}>
-                        {file.name}
-                      </span>
-                    )}
+                    <span className={styles.fileName} title={file.name}>
+                      {file.name}
+                    </span>
                   </td>
 
                   {/* Type badge */}
@@ -519,27 +304,6 @@ export default function FileTable({ files, onRefresh }: FileTableProps) {
                   {/* Actions */}
                   <td className={styles.actionCell}>
                     <div className={styles.actionGroup}>
-                      <button
-                        type="button"
-                        className={styles.actionBtn}
-                        onClick={() => {
-                          setEditingId(file.id);
-                          setEditName(file.name);
-                        }}
-                        title="Rename file"
-                        disabled={isUpdating === file.id}
-                      >
-                        <Pencil size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.actionBtn} ${styles.danger}`}
-                        onClick={() => handleDelete(file.id)}
-                        title="Move to trash"
-                        disabled={isUpdating === file.id}
-                      >
-                        <Trash2 size={13} />
-                      </button>
                       {file.webViewLink && (
                         <a
                           href={file.webViewLink}

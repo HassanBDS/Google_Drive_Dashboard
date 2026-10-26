@@ -11,10 +11,6 @@ import {
   List,
   ArrowDownAZ,
   ArrowUpZA,
-  Pencil,
-  Trash2,
-  Check,
-  X,
   Loader2,
   Square,
   PlayCircle,
@@ -106,9 +102,6 @@ export default function FolderCardGrid({
   onInspect,
   parentTotalSize,
 }: FolderCardGridProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [layout, setLayout] = useState<"grid" | "list">("grid");
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -123,62 +116,6 @@ export default function FolderCardGrid({
   const handleLayoutToggle = (newLayout: "grid" | "list") => {
     setLayout(newLayout);
     localStorage.setItem("folderLayout", newLayout);
-  };
-
-  const handleRename = async (
-    e: React.MouseEvent | React.KeyboardEvent,
-    id: string,
-    oldName: string
-  ) => {
-    e.stopPropagation();
-    if (editName === oldName || !editName.trim()) {
-      setEditingId(null);
-      return;
-    }
-    setIsUpdating(id);
-    try {
-      const res = await fetch("/api/drive/rename", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: id, newName: editName.trim() }),
-      });
-      if (res.ok) {
-        toast.success(`Renamed to "${editName.trim()}"`);
-        onRefresh?.();
-      } else {
-        const d = await res.json();
-        toast.error(d.error || "Failed to rename folder");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(null);
-      setEditingId(null);
-    }
-  };
-
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (!confirm("Are you sure you want to move this folder to trash?")) return;
-    setIsUpdating(id);
-    try {
-      const res = await fetch("/api/drive/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: id }),
-      });
-      if (res.ok) {
-        toast.success("Folder moved to trash");
-        onRefresh?.();
-      } else {
-        const d = await res.json();
-        toast.error(d.error || "Failed to delete folder");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(null);
-    }
   };
 
   // Duplicate detection
@@ -317,55 +254,17 @@ export default function FolderCardGrid({
             </div>
             <div className={styles.nameWrap}>
               <div className={styles.nameRow}>
-                {editingId === folder.id ? (
-                  <div className={styles.editWrap} onClick={(e) => e.stopPropagation()}>
-                    <input
-                      autoFocus
-                      className={styles.editInput}
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleRename(e, folder.id, folder.name);
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
-                    />
-                    <button
-                      className={styles.saveBtn}
-                      onClick={(e) => handleRename(e, folder.id, folder.name)}
-                      disabled={isUpdating === folder.id}
-                    >
-                      {isUpdating === folder.id ? (
-                        <Loader2 size={12} className={styles.spinning} />
-                      ) : (
-                        <Check size={12} />
-                      )}
-                    </button>
-                    <button
-                      className={styles.cancelBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingId(null);
-                      }}
-                      disabled={isUpdating === folder.id}
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className={styles.name} title={folder.name}>
-                      {lang ? lang.label : folder.name}
-                    </div>
-                    {lang && (
-                      <span className={styles.langBadge}>{lang.code}</span>
-                    )}
-                    {warning && (
-                      <span className={`${styles.warningBadge} ${styles[warning.level]}`}>
-                        <AlertTriangle size={10} />
-                        {warning.label}
-                      </span>
-                    )}
-                  </>
+                <div className={styles.name} title={folder.name}>
+                  {lang ? lang.label : folder.name}
+                </div>
+                {lang && (
+                  <span className={styles.langBadge}>{lang.code}</span>
+                )}
+                {warning && (
+                  <span className={`${styles.warningBadge} ${styles[warning.level]}`}>
+                    <AlertTriangle size={10} />
+                    {warning.label}
+                  </span>
                 )}
               </div>
             </div>
@@ -498,34 +397,6 @@ export default function FolderCardGrid({
                 )}
               </div>
             )}
-
-            <Tooltip content="Rename folder">
-              <button
-                type="button"
-                className={styles.actionBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingId(folder.id);
-                  setEditName(folder.name);
-                }}
-                aria-label="Rename folder"
-                disabled={isUpdating === folder.id}
-              >
-                <Pencil size={13} />
-              </button>
-            </Tooltip>
-
-            <Tooltip content="Move to trash">
-              <button
-                type="button"
-                className={`${styles.actionBtn} ${styles.danger}`}
-                onClick={(e) => handleDelete(e, folder.id)}
-                aria-label="Move folder to trash"
-                disabled={isUpdating === folder.id}
-              >
-                <Trash2 size={13} />
-              </button>
-            </Tooltip>
           </div>
         </div>
       );
@@ -555,49 +426,11 @@ export default function FolderCardGrid({
             </div>
             <div className={styles.nameWrap}>
               <div className={styles.nameRow}>
-                {editingId === folder.id ? (
-                  <div className={styles.editWrap} onClick={(e) => e.stopPropagation()}>
-                    <input
-                      autoFocus
-                      className={styles.editInput}
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleRename(e, folder.id, folder.name);
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
-                    />
-                    <button
-                      className={styles.saveBtn}
-                      onClick={(e) => handleRename(e, folder.id, folder.name)}
-                      disabled={isUpdating === folder.id}
-                    >
-                      {isUpdating === folder.id ? (
-                        <Loader2 size={12} className={styles.spinning} />
-                      ) : (
-                        <Check size={12} />
-                      )}
-                    </button>
-                    <button
-                      className={styles.cancelBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingId(null);
-                      }}
-                      disabled={isUpdating === folder.id}
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className={styles.name} title={folder.name}>
-                      {lang ? lang.label : folder.name}
-                    </div>
-                    {lang && (
-                      <span className={styles.langBadge}>{lang.code}</span>
-                    )}
-                  </>
+                <div className={styles.name} title={folder.name}>
+                  {lang ? lang.label : folder.name}
+                </div>
+                {lang && (
+                  <span className={styles.langBadge}>{lang.code}</span>
                 )}
               </div>
             </div>
@@ -666,9 +499,7 @@ export default function FolderCardGrid({
 
           <div
             className={`${styles.cardActions} ${
-              isThisScanning || editingId === folder.id
-                ? styles.cardActionsAlwaysVisible
-                : ""
+              isThisScanning ? styles.cardActionsAlwaysVisible : ""
             }`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -748,36 +579,6 @@ export default function FolderCardGrid({
                 )}
               </div>
             )}
-
-            {/* Rename */}
-            <Tooltip content="Rename folder">
-              <button
-                type="button"
-                className={styles.actionBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingId(folder.id);
-                  setEditName(folder.name);
-                }}
-                aria-label="Rename folder"
-                disabled={isUpdating === folder.id}
-              >
-                <Pencil size={13} />
-              </button>
-            </Tooltip>
-
-            {/* Delete */}
-            <Tooltip content="Move to trash">
-              <button
-                type="button"
-                className={`${styles.actionBtn} ${styles.danger}`}
-                onClick={(e) => handleDelete(e, folder.id)}
-                aria-label="Move folder to trash"
-                disabled={isUpdating === folder.id}
-              >
-                <Trash2 size={13} />
-              </button>
-            </Tooltip>
           </div>
         </div>
       </div>

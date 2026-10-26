@@ -318,6 +318,21 @@
   gap: 10px;
 }
 
+.readOnlyNotice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-muted-foreground, #94A3B8);
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-sm, 8px);
+  text-align: center;
+  user-select: none;
+}
+
 .btn {
   font-family: var(--font-body, sans-serif);
   font-size: 12px;

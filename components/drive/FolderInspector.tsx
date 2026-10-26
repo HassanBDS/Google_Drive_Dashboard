@@ -9,15 +9,12 @@ import {
   Clock,
   RefreshCw,
   ExternalLink,
-  Pencil,
-  Trash2,
   PlayCircle,
   Square,
   Loader2,
   AlertTriangle,
   FolderTree,
 } from "lucide-react";
-import { toast } from "sonner";
 import { formatBytes, formatDate } from "@/lib/utils";
 import type { FolderStat } from "./FolderCard";
 import styles from "./FolderInspector.module.css";
@@ -78,9 +75,6 @@ export default function FolderInspector({
 
   const [children, setChildren] = useState<ChildFolderItem[]>([]);
   const [loadingChildren, setLoadingChildren] = useState(false);
-  const [isRenaming, setIsRenaming] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Capture previous focus element for restoration
   useEffect(() => {
@@ -178,60 +172,7 @@ export default function FolderInspector({
     1
   );
 
-  const handleRename = async () => {
-    if (!newName.trim() || newName === folder.name) {
-      setIsRenaming(false);
-      return;
-    }
 
-    setIsUpdating(true);
-    try {
-      const res = await fetch("/api/drive/rename", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: folder.id, newName: newName.trim() }),
-      });
-      if (res.ok) {
-        toast.success("Folder renamed successfully");
-        setIsRenaming(false);
-        onRefresh?.();
-      } else {
-        const d = await res.json();
-        toast.error(d.error || "Failed to rename folder");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to move "${folder.name}" to trash?`)) {
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const res = await fetch("/api/drive/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: folder.id }),
-      });
-      if (res.ok) {
-        toast.success("Folder moved to trash");
-        onClose();
-        onRefresh?.();
-      } else {
-        const d = await res.json();
-        toast.error(d.error || "Failed to delete folder");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Network error");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   return (
     <>
@@ -411,38 +352,7 @@ export default function FolderInspector({
             )}
           </section>
 
-          {/* Inline Rename Box */}
-          {isRenaming && (
-            <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
-              <input
-                autoFocus
-                className={styles.btnSecondary}
-                style={{ flex: 1, padding: "8px 12px", textAlign: "left" }}
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="New folder name"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRename();
-                  if (e.key === "Escape") setIsRenaming(false);
-                }}
-              />
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.btnPrimary}`}
-                onClick={handleRename}
-                disabled={isUpdating}
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.btnSecondary}`}
-                onClick={() => setIsRenaming(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+
         </div>
 
         {/* Footer Actions */}
@@ -500,28 +410,8 @@ export default function FolderInspector({
             )}
           </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              type="button"
-              className={`${styles.btn} ${styles.btnSecondary}`}
-              style={{ flex: 1 }}
-              onClick={() => {
-                setNewName(folder.name);
-                setIsRenaming((prev) => !prev);
-              }}
-            >
-              <Pencil size={12} /> Rename
-            </button>
-
-            <button
-              type="button"
-              className={`${styles.btn} ${styles.btnDanger}`}
-              style={{ flex: 1 }}
-              onClick={handleDelete}
-              disabled={isUpdating}
-            >
-              <Trash2 size={12} /> Trash
-            </button>
+          <div className={styles.readOnlyNotice}>
+            <span>Read-only dashboard • Drive mutations disabled</span>
           </div>
         </footer>
       </aside>
