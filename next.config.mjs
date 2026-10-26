@@ -26,13 +26,6 @@ if (net.createConnection) net.createConnection = patchFamily(net.createConnectio
 if (tls.connect) tls.connect = patchFamily(tls.connect);
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;

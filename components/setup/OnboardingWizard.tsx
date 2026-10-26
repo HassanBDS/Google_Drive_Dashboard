@@ -257,7 +257,7 @@ export default function OnboardingWizard({ onConfigured }: OnboardingWizardProps
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label}>3. Drive Display Name (Optional)</label>
-              <span className={styles.hint}>e.g. "Main Drive", "Media Library"</span>
+              <span className={styles.hint}>e.g. &quot;Main Drive&quot;, &quot;Media Library&quot;</span>
             </div>
             <input
               type="text"

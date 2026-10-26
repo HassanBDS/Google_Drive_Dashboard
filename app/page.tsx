@@ -139,6 +139,24 @@ function DriveDashboardContent() {
     });
   }, []);
 
+  const fetchBulkStats = useCallback(async (folderIds: string[], refresh = false) => {
+    if (folderIds.length === 0) return;
+    setStatsLoading(true);
+    try {
+      const res = await fetch("/api/drive/bulk-stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folderIds, refresh }),
+      });
+      const bulk: Record<string, FolderStat> = await res.json();
+      setFolderStats((prev) => ({ ...prev, ...bulk }));
+    } catch {
+      // Non-critical
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
   const startFolderScan = useCallback(async (folderId: string, depth = 0) => {
     if (folderScanStates.get(folderId)?.isScanning) return;
 
@@ -210,7 +228,7 @@ function DriveDashboardContent() {
       updateFolderScanState(folderId, { isScanning: false });
       abortRefs.current.delete(folderId);
     }
-  }, [folderScanStates, updateFolderScanState, fetchDeepScanCache, data?.folders]);
+  }, [folderScanStates, updateFolderScanState, fetchDeepScanCache, fetchBulkStats, data?.folders]);
 
   const stopFolderScan = useCallback(async (folderId: string) => {
     updateFolderScanState(folderId, { phase: "stopping" });
@@ -224,24 +242,6 @@ function DriveDashboardContent() {
       console.error(`Failed to stop scan [${folderId}]:`, err);
     }
   }, [updateFolderScanState]);
-
-  const fetchBulkStats = useCallback(async (folderIds: string[], refresh = false) => {
-    if (folderIds.length === 0) return;
-    setStatsLoading(true);
-    try {
-      const res = await fetch("/api/drive/bulk-stats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderIds, refresh }),
-      });
-      const bulk: Record<string, FolderStat> = await res.json();
-      setFolderStats((prev) => ({ ...prev, ...bulk }));
-    } catch {
-      // Non-critical
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
 
   const fetchFolder = useCallback(async (folderId?: string) => {
     setLoading(true);

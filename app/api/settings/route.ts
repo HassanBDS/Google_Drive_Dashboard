@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       fs.writeFileSync(targetCredPath, JSON.stringify(parsed, null, 2), "utf-8");
     }
 
-    if (!fs.existsSync(targetCredPath)) {
+    if (!fs.existsSync(/*turbopackIgnore: true*/ targetCredPath)) {
       return NextResponse.json(
         { error: `Credentials file not found at ${targetCredPath}. Please upload or paste your JSON key.` },
         { status: 400 }

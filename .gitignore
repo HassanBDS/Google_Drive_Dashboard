@@ -70,3 +70,9 @@ Desktop.ini
 tickets/
 docs/
 tasks/
+AGENTS.md
+CLAUDE.md
+.claude/
+.cursor/
+.gemini/
+

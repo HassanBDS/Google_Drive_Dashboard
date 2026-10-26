@@ -13,7 +13,7 @@ let _drive: drive_v3.Drive | null = null;
 
 export function getCredentialsPath(): string {
   const p = process.env.GDRIVE_CREDENTIALS_PATH || "./secrets/service-account.json";
-  return path.resolve(process.cwd(), p);
+  return path.resolve(/*turbopackIgnore: true*/ process.cwd(), p);
 }
 
 export function getRootFolderId(): string {
