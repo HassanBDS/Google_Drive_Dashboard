@@ -35,15 +35,12 @@ export default function Header({
             <input
               type="text"
               className={`${styles.searchInput} ${searchDisabled ? styles.searchInputDisabled : ""}`}
-              placeholder={searchDisabled ? "Search & filter (Coming soon)" : searchPlaceholder}
+              placeholder={searchDisabled ? "Deep Search (Coming soon)" : searchPlaceholder}
               value={searchDisabled ? "" : searchValue}
               onChange={(e) => !searchDisabled && onSearchChange(e.target.value)}
               disabled={searchDisabled}
               title={searchDisabled ? "Deep global search is coming soon" : undefined}
             />
-            {searchDisabled && (
-              <span className={styles.comingSoonBadge}>Soon</span>
-            )}
           </div>
         )}
 
