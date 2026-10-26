@@ -11,6 +11,7 @@ import {
   Sun,
   Moon,
   Cloud,
+  User,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
@@ -19,6 +20,7 @@ import BrandIcon from "@/components/BrandIcon";
 const navItems = [
   { label: "Explorer", href: "/", icon: HardDrive },
   { label: "Settings", href: "/settings", icon: Settings },
+  { label: "About", href: "/about", icon: User },
 ];
 
 export default function Sidebar() {

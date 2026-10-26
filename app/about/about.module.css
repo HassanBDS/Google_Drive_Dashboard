@@ -1,0 +1,310 @@
+.container {
+  min-height: 100vh;
+  padding: 32px 40px;
+  background: var(--bg-primary, #0B1120);
+  color: var(--text-primary, #F8FAFC);
+}
+
+.topNav {
+  max-width: 1040px;
+  margin: 0 auto 24px auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #94A3B8);
+  text-decoration: none;
+  transition: all var(--transition, 150ms ease);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.backLink:hover {
+  color: var(--text-primary, #FFFFFF);
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.16));
+  transform: translateX(-2px);
+}
+
+.contentWrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── 1. Grid Cards ─────────────────────────────────────────────────── */
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.featureCard {
+  background: var(--bg-secondary, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-lg, 16px);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  backdrop-filter: blur(12px);
+}
+
+.privacyCard {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(6, 78, 59, 0.15) 100%);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #FFFFFF);
+  margin: 0;
+}
+
+.cardText {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-secondary, #94A3B8);
+  margin: 0;
+}
+
+.cardText strong {
+  color: var(--text-primary, #F8FAFC);
+}
+
+.privacyList {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.privacyList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #94A3B8);
+}
+
+.privacyList li strong {
+  color: #34D399;
+}
+
+.checkIcon {
+  color: #10B981;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* ── 2. Tech Architecture Banner ───────────────────────────────────── */
+.techBanner {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.techLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.techIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818CF8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.techTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #FFFFFF);
+  margin: 0 0 4px 0;
+}
+
+.techDesc {
+  font-size: 12.5px;
+  color: var(--text-muted, #94A3B8);
+  margin: 0;
+}
+
+.techBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary, #E2E8F0);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* ── 3. Actions Row (Only the two buttons, centered) ───────────────── */
+.ctaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 24px 0;
+  width: 100%;
+  text-align: center;
+}
+
+/* ☕ PayPal Button */
+.sponsorBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #0070BA 0%, #003087 100%);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 24px;
+  border-radius: var(--radius-md, 10px);
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0, 112, 186, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all var(--transition, 150ms ease);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sponsorBtn:hover {
+  background: linear-gradient(135deg, #0079C1 0%, #0045A5 100%);
+  box-shadow: 0 6px 24px rgba(0, 112, 186, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  color: #FFFFFF;
+}
+
+/* GitHub Profile Button */
+.githubBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--bg-surface, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary, #F8FAFC);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 22px;
+  border-radius: var(--radius-md, 10px);
+  text-decoration: none;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  transition: all var(--transition, 150ms ease);
+}
+
+.githubBtn:hover {
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.1));
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.25));
+  transform: translateY(-2px);
+  color: #FFFFFF;
+}
+
+.btnArrow {
+  opacity: 0.7;
+  transition: transform var(--transition, 150ms ease);
+}
+
+.sponsorBtn:hover .btnArrow,
+.githubBtn:hover .btnArrow {
+  transform: translate(2px, -2px);
+  opacity: 1;
+}
+
+/* ── 4. Footer Note with Octicon Star ──────────────────────────────── */
+.footerNote {
+  text-align: center;
+  padding: 10px 20px 24px 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted, #94A3B8);
+}
+
+.footerNote a {
+  color: var(--color-primary, #60A5FA);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footerNote a:hover {
+  text-decoration: underline;
+}
+
+.starLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #FBBF24 !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  transition: all var(--transition, 150ms ease);
+  vertical-align: baseline;
+}
+
+.starLink:hover {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.45);
+  transform: translateY(-1px);
+}
+
+.starIcon {
+  color: #FBBF24;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+  .ctaRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sponsorBtn, .githubBtn {
+    justify-content: center;
+  }
+  .techBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
