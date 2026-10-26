@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Shield,
-  HardDrive,
   Key,
   Database,
   RefreshCw,
@@ -13,8 +11,9 @@ import {
   Save,
   ExternalLink,
   Loader2,
-  FileText,
   Download,
+  Upload,
+  Zap,
 } from "lucide-react";
 import styles from "./settings.module.css";
 
@@ -39,14 +38,19 @@ function formatBytes(bytes: number): string {
   return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
 }
 
+type TabId = "wizard" | "connection" | "cache";
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SettingsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabId>("wizard");
 
   // Form states
   const [driveName, setDriveName] = useState("");
   const [rootFolderId, setRootFolderId] = useState("");
   const [credentialsJson, setCredentialsJson] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Action states
   const [testing, setTesting] = useState(false);
@@ -84,6 +88,20 @@ export default function SettingsPage() {
     if (idMatch) return idMatch[1];
     return trimmed;
   };
+
+  // Handle JSON file upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setCredentialsJson(ev.target?.result as string);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDropZoneClick = () => fileInputRef.current?.click();
 
   const handleTestConnection = async () => {
     setTesting(true);
@@ -146,7 +164,8 @@ export default function SettingsPage() {
         setSaveResult({ success: false, message: data.error || "Failed to save configuration." });
       } else {
         setSaveResult({ success: true, message: data.message || "Settings updated and verified!" });
-        setCredentialsJson(""); // Clear raw JSON once persisted
+        setCredentialsJson("");
+        setUploadedFileName(null);
         await fetchSettings();
       }
     } catch (err: any) {
@@ -157,17 +176,13 @@ export default function SettingsPage() {
   };
 
   const handleFlushCache = async () => {
-    if (!confirm("Are you sure you want to clear the folder size scan cache? This will reset all precomputed sizes.")) {
-      return;
-    }
+    if (!confirm("Are you sure you want to clear the folder size scan cache? This will reset all precomputed sizes.")) return;
 
     setFlushing(true);
     setFlushResult(null);
 
     try {
-      const res = await fetch("/api/settings?action=flush-cache", {
-        method: "DELETE",
-      });
+      const res = await fetch("/api/settings?action=flush-cache", { method: "DELETE" });
       const data = await res.json();
       if (!res.ok || data.error) {
         setFlushResult({ success: false, message: data.error || "Failed to flush cache." });
@@ -193,283 +208,390 @@ export default function SettingsPage() {
     );
   }
 
+  const isConfigured = settings?.isConfigured ?? false;
+
   return (
     <div className={styles.container}>
+      {/* ── Page Header ────────────────────────────────────────────── */}
       <header className={styles.header}>
-        <h1 className={styles.title}>Settings &amp; Configuration</h1>
-        <p className={styles.subtitle}>
-          Configure your Google Cloud Service Account, root folder, and disk usage scanner cache.
-        </p>
-      </header>
-
-      <div className={styles.grid}>
-        {/* Card 1: Live Status */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardTitleGroup}>
-              <div className={styles.cardIcon}>
-                <HardDrive size={20} />
-              </div>
-              <div>
-                <h2 className={styles.cardTitle}>Active Connection</h2>
-                <div className={styles.cardDesc}>Current Google Drive integration status</div>
-              </div>
-            </div>
-
-            <div
-              className={`${styles.statusBadge} ${
-                settings?.isConfigured ? styles.connected : styles.disconnected
-              }`}
-            >
-              <span className={styles.statusDot} />
-              <span>{settings?.isConfigured ? "Connected" : "Setup Required"}</span>
-            </div>
+        <div className={styles.headerTop}>
+          <div className={styles.titleGroup}>
+            <h1 className={styles.title}>Settings &amp; Configuration</h1>
+            <p className={styles.subtitle}>
+              Connect your Google Drive via a Service Account, manage the root folder, and control the scanner cache.
+            </p>
           </div>
 
-          <div className={styles.detailsList}>
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>Drive Display Name</div>
-              <div className={styles.detailValue}>{settings?.driveName || "Not set"}</div>
-            </div>
+          <div className={`${styles.statusPill} ${isConfigured ? styles.connected : styles.disconnected}`}>
+            <span className={styles.statusDot} />
+            <span>{isConfigured ? "Drive Connected" : "Setup Required"}</span>
+          </div>
+        </div>
 
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>Root Folder ID</div>
-              <div className={styles.detailValue}>
+        {/* Live status strip */}
+        {isConfigured && (
+          <div className={styles.statusStrip}>
+            <div className={styles.statusItem}>
+              <div className={styles.statusLabel}>Drive Name</div>
+              <div className={styles.statusValue}>{settings?.driveName || "—"}</div>
+            </div>
+            <div className={styles.statusItem}>
+              <div className={styles.statusLabel}>Root Folder ID</div>
+              <div className={styles.statusValue}>
                 {settings?.rootFolderId ? (
                   <a
                     href={`https://drive.google.com/drive/folders/${settings.rootFolderId}`}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
                   >
                     {settings.rootFolderId}
-                    <ExternalLink size={12} />
+                    <ExternalLink size={11} />
                   </a>
-                ) : (
-                  "Not set"
-                )}
+                ) : "—"}
               </div>
             </div>
-
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>Service Account Email</div>
-              <div className={styles.detailValue}>{settings?.clientEmail || "Not detected"}</div>
+            <div className={styles.statusItem}>
+              <div className={styles.statusLabel}>Service Account Email</div>
+              <div className={styles.statusValue}>{settings?.clientEmail || "—"}</div>
             </div>
+            <div className={styles.statusItem}>
+              <div className={styles.statusLabel}>GCP Project</div>
+              <div className={styles.statusValue}>{settings?.projectId || "—"}</div>
+            </div>
+          </div>
+        )}
+      </header>
 
-            <div className={styles.detailItem}>
-              <div className={styles.detailLabel}>Google Cloud Project</div>
-              <div className={styles.detailValue}>{settings?.projectId || "Not detected"}</div>
+      {/* ── Tabs ───────────────────────────────────────────────────── */}
+      <div className={styles.tabs} role="tablist">
+        <button
+          id="tab-wizard"
+          role="tab"
+          aria-selected={activeTab === "wizard"}
+          className={`${styles.tab} ${activeTab === "wizard" ? styles.activeTab : ""}`}
+          onClick={() => setActiveTab("wizard")}
+        >
+          <Key size={15} className={styles.tabIcon} />
+          Setup Wizard
+        </button>
+        <button
+          id="tab-connection"
+          role="tab"
+          aria-selected={activeTab === "connection"}
+          className={`${styles.tab} ${activeTab === "connection" ? styles.activeTab : ""}`}
+          onClick={() => setActiveTab("connection")}
+        >
+          <Zap size={15} className={styles.tabIcon} />
+          Test Connection
+        </button>
+        <button
+          id="tab-cache"
+          role="tab"
+          aria-selected={activeTab === "cache"}
+          className={`${styles.tab} ${activeTab === "cache" ? styles.activeTab : ""}`}
+          onClick={() => setActiveTab("cache")}
+        >
+          <Database size={15} className={styles.tabIcon} />
+          Cache &amp; Storage
+        </button>
+      </div>
+
+      {/* ── Panel: Setup Wizard ─────────────────────────────────────── */}
+      {activeTab === "wizard" && (
+        <div className={styles.panel} role="tabpanel" aria-labelledby="tab-wizard">
+
+          {/* Step 1: Google Cloud Project */}
+          <div className={styles.stepCard}>
+            <div className={styles.stepHeader}>
+              <div className={`${styles.stepBadge} ${isConfigured ? styles.stepBadgeDone : ""}`}>
+                {isConfigured ? <CheckCircle2 size={16} /> : "1"}
+              </div>
+              <div className={styles.stepInfo}>
+                <h2 className={styles.stepTitle}>Create a Google Cloud Project &amp; Enable Drive API</h2>
+                <p className={styles.stepDesc}>One-time setup in Google Cloud Console</p>
+              </div>
+            </div>
+            <div className={styles.stepBody}>
+              <p className={styles.stepInstruction}>
+                Open <code>console.cloud.google.com</code>, go to <strong>APIs &amp; Services → Enable APIs</strong> and search for <strong>Google Drive API</strong>. Click Enable. If you don&apos;t have a project yet, create one — it&apos;s free.
+              </p>
             </div>
           </div>
 
-          <div className={styles.actionsRow}>
-            <button
-              type="button"
-              className={styles.btnSecondary}
-              onClick={handleTestConnection}
-              disabled={testing || !settings?.isConfigured}
-            >
-              {testing ? (
-                <>
-                  <Loader2 size={15} className="spinning" />
-                  Testing Connection…
-                </>
-              ) : (
-                <>
-                  <RefreshCw size={15} />
-                  Test Live Connection
-                </>
+          {/* Step 2: Create Service Account */}
+          <div className={styles.stepCard}>
+            <div className={styles.stepHeader}>
+              <div className={`${styles.stepBadge} ${isConfigured ? styles.stepBadgeDone : ""}`}>
+                {isConfigured ? <CheckCircle2 size={16} /> : "2"}
+              </div>
+              <div className={styles.stepInfo}>
+                <h2 className={styles.stepTitle}>Create a Service Account &amp; Download Key</h2>
+                <p className={styles.stepDesc}>Generate a JSON key file — this is your app&apos;s secure credential</p>
+              </div>
+            </div>
+            <div className={styles.stepBody}>
+              <p className={styles.stepInstruction}>
+                Go to <strong>IAM &amp; Admin → Service Accounts → Create Service Account</strong>. Give it any name (e.g. <code>drive-dashboard</code>). Then open the account, go to <strong>Keys → Add Key → Create new key → JSON</strong>. A <code>.json</code> file will download to your computer.
+              </p>
+              <p className={styles.stepWarning}>
+                Keep this JSON file private — never commit it to Git or share it publicly. It grants read access to any Drive folder you share with the service account email.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Share Drive Folder */}
+          <div className={styles.stepCard}>
+            <div className={styles.stepHeader}>
+              <div className={`${styles.stepBadge} ${isConfigured ? styles.stepBadgeDone : ""}`}>
+                {isConfigured ? <CheckCircle2 size={16} /> : "3"}
+              </div>
+              <div className={styles.stepInfo}>
+                <h2 className={styles.stepTitle}>Share Your Google Drive Root Folder</h2>
+                <p className={styles.stepDesc}>Grant Viewer access to the service account email</p>
+              </div>
+            </div>
+            <div className={styles.stepBody}>
+              <p className={styles.stepInstruction}>
+                Open <code>drive.google.com</code>, right-click the folder you want to scan, select <strong>Share</strong>, and paste the service account email (it ends in <code>@...iam.gserviceaccount.com</code>). Set the role to <strong>Viewer</strong>.
+              </p>
+              {settings?.clientEmail && (
+                <p className={styles.stepEmail}>
+                  Your service account email: <code>{settings.clientEmail}</code>
+                </p>
               )}
-            </button>
+            </div>
           </div>
 
-          {testResult && (
-            <div
-              className={`${styles.feedbackBanner} ${
-                testResult.success ? styles.success : styles.error
-              }`}
-            >
-              {testResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-              <span>{testResult.message}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Card 2: Update Configuration */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardTitleGroup}>
-              <div className={styles.cardIcon}>
-                <Key size={20} />
+          {/* Step 4: Configure App */}
+          <div className={styles.stepCard}>
+            <div className={styles.stepHeader}>
+              <div className={`${styles.stepBadge} ${isConfigured ? styles.stepBadgeDone : ""}`}>
+                {isConfigured ? <CheckCircle2 size={16} /> : "4"}
               </div>
-              <div>
-                <h2 className={styles.cardTitle}>Credentials &amp; Target Folder</h2>
-                <div className={styles.cardDesc}>
-                  Update root folder or replace the service account key without touching code
+              <div className={styles.stepInfo}>
+                <h2 className={styles.stepTitle}>Upload Credentials &amp; Set Root Folder</h2>
+                <p className={styles.stepDesc}>Configure this app with your key and folder ID</p>
+              </div>
+            </div>
+            <div className={styles.stepBody}>
+              <form onSubmit={handleSaveSettings} className={styles.form}>
+                {/* Drive Display Name */}
+                <div className={styles.field}>
+                  <label className={styles.label}>Drive Display Name (optional)</label>
+                  <input
+                    id="settings-drive-name"
+                    type="text"
+                    className={styles.input}
+                    placeholder="e.g. My Google Drive"
+                    value={driveName}
+                    onChange={(e) => setDriveName(e.target.value)}
+                  />
+                  <span className={styles.hint}>A friendly label shown in the dashboard header.</span>
                 </div>
-              </div>
+
+                {/* Root Folder ID */}
+                <div className={styles.field}>
+                  <label className={styles.label}>Google Drive Root Folder ID or URL <span style={{ color: "var(--error)" }}>*</span></label>
+                  <input
+                    id="settings-folder-id"
+                    type="text"
+                    className={styles.input}
+                    placeholder="e.g. 1a2b3c... or https://drive.google.com/drive/folders/..."
+                    value={rootFolderId}
+                    onChange={(e) => setRootFolderId(e.target.value)}
+                    required
+                  />
+                  <span className={styles.hint}>
+                    You can paste the full Google Drive URL — the folder ID will be extracted automatically.
+                  </span>
+                </div>
+
+                {/* JSON Key Upload */}
+                <div className={styles.field}>
+                  <label className={styles.label}>Service Account JSON Key {isConfigured ? "(leave blank to keep existing)" : ""}</label>
+
+                  {/* Drop zone */}
+                  <div className={styles.uploadZone} onClick={handleDropZoneClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && handleDropZoneClick()}>
+                    <Upload size={22} className={styles.uploadZoneIcon} />
+                    <div className={styles.uploadZoneText}>
+                      {uploadedFileName ? `✓ ${uploadedFileName}` : "Click to upload service-account.json"}
+                    </div>
+                    <div className={styles.uploadZoneSub}>or paste JSON below</div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".json,application/json"
+                      style={{ display: "none" }}
+                      onChange={handleFileUpload}
+                      id="settings-credentials-file"
+                    />
+                  </div>
+
+                  <textarea
+                    id="settings-credentials-json"
+                    className={styles.textarea}
+                    placeholder='{ "type": "service_account", "project_id": "...", ... }'
+                    value={credentialsJson}
+                    onChange={(e) => setCredentialsJson(e.target.value)}
+                  />
+                  <span className={styles.hint}>
+                    Current key file: <code>{settings?.credentialsPath}</code>{" "}
+                    ({settings?.credentialsFound ? "✓ Present" : "✗ Missing"})
+                  </span>
+                </div>
+
+                <div className={styles.actionsRow}>
+                  <button
+                    id="settings-save-btn"
+                    type="submit"
+                    className={styles.btnPrimary}
+                    disabled={saving || !rootFolderId.trim()}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 size={15} className="spinning" />
+                        Validating &amp; Saving…
+                      </>
+                    ) : (
+                      <>
+                        <Save size={15} />
+                        Save &amp; Verify
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {saveResult && (
+                  <div className={`${styles.feedbackBanner} ${saveResult.success ? styles.success : styles.error}`}>
+                    {saveResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                    <span>{saveResult.message}</span>
+                  </div>
+                )}
+              </form>
             </div>
           </div>
 
-          <form onSubmit={handleSaveSettings} className={styles.form}>
-            <div className={styles.field}>
-              <label className={styles.label}>Drive Display Name</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="Google Drive"
-                value={driveName}
-                onChange={(e) => setDriveName(e.target.value)}
-              />
-            </div>
+          {/* Security Note */}
+          <div className={styles.securityNote}>
+            <p><strong>🔒 Security &amp; Privacy:</strong></p>
+            <p style={{ marginTop: "6px" }}>
+              Your credentials are saved strictly on this local machine in <code>.env.local</code> and <code>secrets/service-account.json</code>. Both files are permanently listed in <code>.gitignore</code> and are never uploaded, shared, or transmitted anywhere. The author of this application will never have access to your keys or Drive files.
+            </p>
+          </div>
+        </div>
+      )}
 
-            <div className={styles.field}>
-              <label className={styles.label}>Google Drive Root Folder ID or URL</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="e.g. 1a2b3c4d5e... or https://drive.google.com/drive/folders/..."
-                value={rootFolderId}
-                onChange={(e) => setRootFolderId(e.target.value)}
-                required
-              />
-              <span className={styles.hint}>
-                You can paste the full Google Drive folder link from your browser.
-              </span>
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>Update Service Account JSON Key (Optional)</label>
-              <textarea
-                className={styles.textarea}
-                placeholder="Leave blank to keep existing key, or paste new service-account.json content here..."
-                value={credentialsJson}
-                onChange={(e) => setCredentialsJson(e.target.value)}
-              />
-              <span className={styles.hint}>
-                Current key: <code>{settings?.credentialsPath}</code> ({settings?.credentialsFound ? "Present" : "Missing"})
-              </span>
-            </div>
-
-            <div className={styles.actionsRow}>
+      {/* ── Panel: Test Connection ──────────────────────────────────── */}
+      {activeTab === "connection" && (
+        <div className={styles.panel} role="tabpanel" aria-labelledby="tab-connection">
+          <div className={styles.card}>
+            <div className={styles.actionsRow} style={{ marginBottom: "16px" }}>
               <button
-                type="submit"
-                className={styles.btnPrimary}
-                disabled={saving || !rootFolderId.trim()}
+                id="settings-test-btn"
+                type="button"
+                className={styles.btnSecondary}
+                onClick={handleTestConnection}
+                disabled={testing || !isConfigured}
               >
-                {saving ? (
+                {testing ? (
                   <>
                     <Loader2 size={15} className="spinning" />
-                    Validating &amp; Saving…
+                    Testing Connection…
                   </>
                 ) : (
                   <>
-                    <Save size={15} />
-                    Save &amp; Verify
+                    <RefreshCw size={15} />
+                    Test Live Connection
+                  </>
+                )}
+              </button>
+              {!isConfigured && (
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>
+                  Complete Setup Wizard first to enable connection testing.
+                </span>
+              )}
+            </div>
+
+            {testResult && (
+              <div className={`${styles.feedbackBanner} ${testResult.success ? styles.success : styles.error}`}>
+                {testResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{testResult.message}</span>
+              </div>
+            )}
+
+            {!testResult && isConfigured && !testing && (
+              <p className={styles.infoNote}>
+                Click <strong>Test Live Connection</strong> to verify the service account can reach your Google Drive folder. This makes a real API call and reports back the folder name and access status.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Panel: Cache & Storage ──────────────────────────────────── */}
+      {activeTab === "cache" && (
+        <div className={styles.panel} role="tabpanel" aria-labelledby="tab-cache">
+          <div className={styles.card}>
+            <div className={styles.cacheStatsRow}>
+              <div className={styles.cacheStatItem}>
+                <div className={styles.cacheStatValue}>{settings?.cacheStats.fileCount ?? 0}</div>
+                <div className={styles.cacheStatLabel}>Cached Folders</div>
+              </div>
+              <div className={styles.cacheStatItem}>
+                <div className={styles.cacheStatValue}>
+                  {formatBytes(settings?.cacheStats.totalSizeBytes ?? 0)}
+                </div>
+                <div className={styles.cacheStatLabel}>Total Disk Usage</div>
+              </div>
+            </div>
+
+            <div className={styles.actionsRow}>
+              <a
+                id="settings-export-cache-btn"
+                href="/api/drive/export-cache"
+                className={styles.btnSecondary}
+                style={{ textDecoration: "none" }}
+                title="Download consolidated cache file as JSON"
+                download
+              >
+                <Download size={15} />
+                Download Cache Export
+              </a>
+
+              <button
+                id="settings-flush-cache-btn"
+                type="button"
+                className={styles.btnDanger}
+                onClick={handleFlushCache}
+                disabled={flushing || (settings?.cacheStats.fileCount === 0)}
+              >
+                {flushing ? (
+                  <>
+                    <Loader2 size={15} className="spinning" />
+                    Flushing Cache…
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={15} />
+                    Flush Size Cache
                   </>
                 )}
               </button>
             </div>
 
-            {saveResult && (
-              <div
-                className={`${styles.feedbackBanner} ${
-                  saveResult.success ? styles.success : styles.error
-                }`}
-              >
-                {saveResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                <span>{saveResult.message}</span>
+            {flushResult && (
+              <div className={`${styles.feedbackBanner} ${flushResult.success ? styles.success : styles.error}`}>
+                {flushResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{flushResult.message}</span>
               </div>
             )}
-          </form>
-        </div>
 
-        {/* Card 3: Cache & Storage */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div className={styles.cardTitleGroup}>
-              <div className={styles.cardIcon}>
-                <Database size={20} />
-              </div>
-              <div>
-                <h2 className={styles.cardTitle}>Scanner Cache &amp; Storage</h2>
-                <div className={styles.cardDesc}>
-                  Precomputed folder size checkpoints saved on local disk
-                </div>
-              </div>
-            </div>
+            <p className={styles.infoNote} style={{ marginTop: "20px" }}>
+              The <strong>cache export</strong> downloads a consolidated JSON snapshot of all scanned folder sizes, useful for offline analysis or backups. <strong>Flush Size Cache</strong> wipes the precomputed sizes so the next deep-scan starts fresh.
+            </p>
           </div>
-
-          <div className={styles.cacheStatsRow}>
-            <div className={styles.cacheStatItem}>
-              <div className={styles.cacheStatValue}>{settings?.cacheStats.fileCount ?? 0}</div>
-              <div className={styles.cacheStatLabel}>Cached Folders</div>
-            </div>
-            <div className={styles.cacheStatItem}>
-              <div className={styles.cacheStatValue}>
-                {formatBytes(settings?.cacheStats.totalSizeBytes ?? 0)}
-              </div>
-              <div className={styles.cacheStatLabel}>Total Disk Usage</div>
-            </div>
-          </div>
-
-          <div className={styles.actionsRow}>
-            <a
-              href="/api/drive/export-cache"
-              className={styles.btnSecondary}
-              style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}
-              title="Download consolidated cache file as JSON"
-              download
-            >
-              <Download size={15} />
-              Download Cache Export
-            </a>
-
-            <button
-              type="button"
-              className={styles.btnDanger}
-              onClick={handleFlushCache}
-              disabled={flushing || (settings?.cacheStats.fileCount === 0)}
-            >
-              {flushing ? (
-                <>
-                  <Loader2 size={15} className="spinning" />
-                  Flushing Cache…
-                </>
-              ) : (
-                <>
-                  <Trash2 size={15} />
-                  Flush Size Cache
-                </>
-              )}
-            </button>
-          </div>
-
-          {flushResult && (
-            <div
-              className={`${styles.feedbackBanner} ${
-                flushResult.success ? styles.success : styles.error
-              }`}
-            >
-              {flushResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-              <span>{flushResult.message}</span>
-            </div>
-          )}
         </div>
-
-        {/* Card 4: Security & Sharing Guide */}
-        <div className={styles.securityNote}>
-          <p>
-            <strong>Security &amp; Permissions Note:</strong>
-          </p>
-          <p style={{ marginTop: "6px" }}>
-            Your credentials and configuration are saved strictly on this local machine in <code>.env.local</code> and <code>secrets/service-account.json</code>. Both files are permanently ignored by <code>.gitignore</code> and never uploaded.
-          </p>
-          <p style={{ marginTop: "6px" }}>
-            Make sure to share your target Google Drive folder with your Service Account email (<code>{settings?.clientEmail || "your-sa@project.iam.gserviceaccount.com"}</code>) with at least <strong>Viewer</strong> role (or <strong>Editor / Content Manager</strong> if you plan to rename or manage files).
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
