@@ -12,11 +12,18 @@ import {
   ScanProgress,
   FolderSizeCacheData,
 } from "@/lib/drive-size-scanner";
+import {
+  validateDriveId,
+  validatePositiveInt,
+  validateStringArray,
+  ValidationError,
+} from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const folderId = searchParams.get("folderId") || null;
+    const rawFolderId = searchParams.get("folderId");
+    const folderId = rawFolderId ? validateDriveId(rawFolderId) : null;
     const flat = searchParams.get("flat") === "true";
     const reconcileParam = searchParams.get("reconcile");
 
@@ -24,7 +31,8 @@ export async function GET(request: NextRequest) {
     
     let index = readMasterIndex();
     if (reconcileParam) {
-      const validIds = reconcileParam.split(",").filter(Boolean);
+      const rawIds = reconcileParam.split(",").filter(Boolean);
+      const validIds = validateStringArray(rawIds, 500);
       if (validIds.length > 0) {
         index = reconcileCache(validIds);
       }
@@ -78,9 +86,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Deep scan GET error:", error);
+    const status = error instanceof ValidationError ? 400 : 500;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to read size cache" },
-      { status: 500 }
+      { status }
     );
   }
 }
@@ -96,14 +105,21 @@ const activeScanMap = new Map<string, ActiveScan>();
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const folderId: string | undefined = body.folderId;
+    const rawFolderId = body.folderId;
+    const folderId = rawFolderId ? validateDriveId(rawFolderId) : undefined;
     const action: string | undefined = body.action;
-    const initialDepth: number = body.initialDepth ?? 1;
+    const initialDepth: number = validatePositiveInt(body.initialDepth, 1, 10, 1);
 
     const scanKey = folderId || "root";
 
     if (action === "reconcile") {
-      const validFolderIds: string[] = body.validFolderIds ?? [];
+      if (!Array.isArray(body.validFolderIds) || body.validFolderIds.length === 0) {
+        return NextResponse.json(
+          { error: "validFolderIds must be a non-empty array" },
+          { status: 400 }
+        );
+      }
+      const validFolderIds = validateStringArray(body.validFolderIds, 500);
       const updatedIndex = reconcileCache(validFolderIds);
       return NextResponse.json({
         status: "reconciled",
@@ -217,9 +233,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Deep scan POST error:", error);
+    const status = error instanceof ValidationError ? 400 : 500;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to start scan" },
-      { status: 500 }
+      { status }
     );
   }
 }

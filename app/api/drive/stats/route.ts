@@ -1,19 +1,22 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getFolderStats } from "@/lib/google-drive";
+import { validateDriveId, ValidationError } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const folderId = searchParams.get("folderId") || undefined;
+    const rawFolderId = searchParams.get("folderId");
+    const folderId = rawFolderId ? validateDriveId(rawFolderId) : undefined;
 
     const stats = await getFolderStats(folderId);
     return NextResponse.json(stats);
   } catch (error) {
     console.error("Drive stats error:", error);
+    const status = error instanceof ValidationError ? 400 : 500;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to get stats" },
-      { status: 500 }
+      { status }
     );
   }
 }

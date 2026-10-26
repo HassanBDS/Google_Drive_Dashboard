@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFolderShallowStats } from "@/lib/google-drive";
 import { buildFlatSizeMap } from "@/lib/drive-size-scanner";
+import { validateStringArray, ValidationError } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const folderIds: string[] = body.folderIds ?? [];
-    const refresh: boolean = body.refresh === true;
-
-    if (!Array.isArray(folderIds) || folderIds.length === 0) {
+    if (!body.folderIds || !Array.isArray(body.folderIds) || body.folderIds.length === 0) {
       return NextResponse.json({});
     }
+
+    const folderIds: string[] = validateStringArray(body.folderIds, 50);
+    const refresh: boolean = body.refresh === true;
 
     const flatSizeMap = buildFlatSizeMap();
 
@@ -56,9 +57,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(out);
   } catch (error) {
     console.error("Bulk stats error:", error);
+    const status = error instanceof ValidationError ? 400 : 500;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Bulk stats failed" },
-      { status: 500 }
+      { status }
     );
   }
 }

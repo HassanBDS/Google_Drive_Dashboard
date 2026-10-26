@@ -6,6 +6,7 @@ import { google, drive_v3 } from "googleapis";
 import path from "path";
 import fs from "fs";
 import { getCredentialsPath, getRootFolderId } from "@/lib/google-drive";
+import { validateDriveId } from "@/lib/validation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,11 +87,13 @@ function cacheDir(): string {
 }
 
 function cacheFilePath(folderId: string): string {
-  return path.join(cacheDir(), `${folderId}.json`);
+  const safeId = validateDriveId(folderId);
+  return path.join(cacheDir(), `${safeId}.json`);
 }
 
 function checkpointFilePath(folderId: string): string {
-  return path.join(cacheDir(), `${folderId}-checkpoint.json`);
+  const safeId = validateDriveId(folderId);
+  return path.join(cacheDir(), `${safeId}-checkpoint.json`);
 }
 
 function indexFilePath(): string {
@@ -170,23 +173,39 @@ export function deleteFolderSizeCache(folderId: string): void {
 
 export function reconcileCache(validFolderIds: string[]): MasterIndex {
   const dir = cacheDir();
-  if (fs.existsSync(dir) && Array.isArray(validFolderIds) && validFolderIds.length > 0) {
-    const validSet = new Set(validFolderIds);
-    const files = fs.readdirSync(dir);
-    for (const f of files) {
-      if (f === "index.json" || f.endsWith(".backup.json") || f === ".gitkeep") continue;
-      if (f.endsWith("-checkpoint.json")) {
-        const id = f.replace("-checkpoint.json", "");
-        if (!validSet.has(id)) {
-          try { fs.unlinkSync(path.join(dir, f)); } catch {}
-        }
-        continue;
+  if (!fs.existsSync(dir) || !Array.isArray(validFolderIds) || validFolderIds.length === 0) {
+    return readMasterIndex() ?? rebuildMasterIndex();
+  }
+
+  // Validate all folder IDs before proceeding with file deletion
+  const sanitizedIds: string[] = [];
+  for (const id of validFolderIds) {
+    try {
+      sanitizedIds.push(validateDriveId(id));
+    } catch {
+      // Ignore malformed ID
+    }
+  }
+
+  if (sanitizedIds.length === 0) {
+    return readMasterIndex() ?? rebuildMasterIndex();
+  }
+
+  const validSet = new Set(sanitizedIds);
+  const files = fs.readdirSync(dir);
+  for (const f of files) {
+    if (f === "index.json" || f.endsWith(".backup.json") || f === ".gitkeep") continue;
+    if (f.endsWith("-checkpoint.json")) {
+      const id = f.replace("-checkpoint.json", "");
+      if (!validSet.has(id)) {
+        try { fs.unlinkSync(path.join(dir, f)); } catch {}
       }
-      if (f.endsWith(".json")) {
-        const id = f.replace(".json", "");
-        if (!validSet.has(id)) {
-          try { fs.unlinkSync(path.join(dir, f)); } catch {}
-        }
+      continue;
+    }
+    if (f.endsWith(".json")) {
+      const id = f.replace(".json", "");
+      if (!validSet.has(id)) {
+        try { fs.unlinkSync(path.join(dir, f)); } catch {}
       }
     }
   }
