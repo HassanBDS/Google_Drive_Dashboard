@@ -2,12 +2,14 @@
  * Google Drive API client — server-only.
  * Uses service account credentials for authentication.
  * Single-drive architecture configured via environment variables.
+ * Read-only OAuth scope.
  */
 import { google, drive_v3 } from "googleapis";
 import path from "path";
 import fs from "fs";
 
-const SCOPES = ["https://www.googleapis.com/auth/drive"];
+// Read-only scope: this app never renames, deletes, or writes to Google Drive
+const SCOPES = ["https://www.googleapis.com/auth/drive.readonly"];
 
 let _drive: drive_v3.Drive | null = null;
 
@@ -377,60 +379,4 @@ export async function listSubFolders(parentId: string): Promise<DriveItem[]> {
   } while (pageToken);
 
   return folders;
-}
-
-/**
- * Renames a single Drive file/folder with sibling collision check.
- */
-export async function renameFile(
-  fileId: string,
-  newName: string,
-  expectedParentId?: string
-): Promise<{ id: string; name: string }> {
-  const drive = getDriveClient();
-
-  if (expectedParentId) {
-    const meta = await driveCall(() =>
-      drive.files.get({ fileId, fields: "id, parents" })
-    );
-    const parents = (meta.data.parents as string[] | undefined) ?? [];
-    if (!parents.includes(expectedParentId)) {
-      throw new Error(`File ${fileId} no longer belongs to parent ${expectedParentId} — rename aborted.`);
-    }
-
-    const siblings = await driveCall(() =>
-      drive.files.list({
-        q: `'${expectedParentId}' in parents and name = '${newName.replace(/'/g, "\\'").replace(/\\/g, "\\\\")}' and trashed = false`,
-        fields: "files(id)",
-        pageSize: 1,
-      })
-    );
-    if ((siblings.data.files ?? []).length > 0) {
-      throw new Error(`Collision: "${newName}" already exists in the parent folder.`);
-    }
-  }
-
-  const updated = await driveCall(() =>
-    drive.files.update({
-      fileId,
-      requestBody: { name: newName },
-      fields: "id, name",
-    })
-  );
-
-  return { id: updated.data.id!, name: updated.data.name! };
-}
-
-/**
- * Moves a file or folder to trash.
- */
-export async function deleteFile(fileId: string): Promise<{ success: boolean }> {
-  const drive = getDriveClient();
-  await driveCall(() =>
-    drive.files.update({
-      fileId,
-      requestBody: { trashed: true },
-    })
-  );
-  return { success: true };
 }
