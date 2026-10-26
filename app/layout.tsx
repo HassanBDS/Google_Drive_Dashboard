@@ -54,22 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={fontClasses} suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var savedTheme = localStorage.getItem('theme');
-                  var theme = savedTheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-                  document.documentElement.setAttribute('data-theme', theme);
-                  if (localStorage.getItem('sidebar_collapsed') === 'true') {
-                    document.documentElement.classList.add('sidebar-collapsed');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        <script src="/theme-init.js" />
       </head>
       <body>
         <TooltipProvider>
