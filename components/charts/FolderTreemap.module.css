@@ -155,7 +155,7 @@
 .tooltipDetails {
   font-family: var(--font-mono, monospace);
   font-size: 11px;
-  color: var(--color-primary, #60A5FA);
+  color: #60A5FA;
   margin-top: 2px;
 }
 

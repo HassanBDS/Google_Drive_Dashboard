@@ -16,20 +16,36 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted, #94A3B8);
+  color: var(--text-secondary, #475569);
   text-decoration: none;
   transition: all var(--transition, 150ms ease);
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-sm, 8px);
-  background: var(--bg-surface, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--bg-secondary, #FFFFFF);
+  border: 1px solid var(--border, #E2E8F0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .backLink:hover {
+  color: var(--text-primary, #0F172A);
+  background: var(--bg-card-hover, #F1F5FD);
+  border-color: var(--border-hover, rgba(37, 99, 235, 0.2));
+  transform: translateX(-2px);
+}
+
+:global(:root[data-theme="dark"]) .backLink,
+:global(:root[data-theme="dim"]) .backLink {
+  color: var(--text-muted, #94A3B8);
+  background: var(--bg-surface, rgba(255, 255, 255, 0.04));
+  border-color: var(--border, rgba(255, 255, 255, 0.08));
+  box-shadow: none;
+}
+
+:global(:root[data-theme="dark"]) .backLink:hover,
+:global(:root[data-theme="dim"]) .backLink:hover {
   color: var(--text-primary, #FFFFFF);
   background: var(--bg-card-hover, rgba(255, 255, 255, 0.08));
   border-color: var(--border-hover, rgba(255, 255, 255, 0.16));
-  transform: translateX(-2px);
 }
 
 .contentWrap {
@@ -59,8 +75,16 @@
 }
 
 .privacyCard {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, var(--bg-secondary, #FFFFFF) 0%, rgba(16, 185, 129, 0.08) 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(16, 185, 129, 0.06);
+}
+
+:global(:root[data-theme="dark"]) .privacyCard,
+:global(:root[data-theme="dim"]) .privacyCard {
   border-color: rgba(16, 185, 129, 0.25);
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(6, 78, 59, 0.15) 100%);
+  box-shadow: none;
 }
 
 .cardHeader {
@@ -106,13 +130,23 @@
 }
 
 .privacyList li strong {
+  color: #047857;
+}
+
+:global(:root[data-theme="dark"]) .privacyList li strong,
+:global(:root[data-theme="dim"]) .privacyList li strong {
   color: #34D399;
 }
 
 .checkIcon {
-  color: #10B981;
+  color: #059669;
   flex-shrink: 0;
   margin-top: 3px;
+}
+
+:global(:root[data-theme="dark"]) .checkIcon,
+:global(:root[data-theme="dim"]) .checkIcon {
+  color: #10B981;
 }
 
 /* ── 2. Tech Architecture Banner ───────────────────────────────────── */
@@ -138,12 +172,18 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(99, 102, 241, 0.15);
-  color: #818CF8;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4F46E5;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+:global(:root[data-theme="dark"]) .techIconWrap,
+:global(:root[data-theme="dim"]) .techIconWrap {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818CF8;
 }
 
 .techTitle {
@@ -170,11 +210,20 @@
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-secondary, #E2E8F0);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #1E293B);
+  background: var(--bg-secondary, #FFFFFF);
+  border: 1px solid var(--border, #E2E8F0);
   padding: 4px 10px;
   border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+:global(:root[data-theme="dark"]) .badge,
+:global(:root[data-theme="dim"]) .badge {
+  color: var(--text-secondary, #E2E8F0);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
 }
 
 /* ── 3. Actions Row (Only the two buttons, centered) ───────────────── */
@@ -218,21 +267,37 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  background: var(--bg-surface, rgba(255, 255, 255, 0.05));
-  color: var(--text-primary, #F8FAFC);
+  background: var(--bg-secondary, #FFFFFF);
+  color: var(--text-primary, #0F172A);
   font-size: 14px;
   font-weight: 600;
   padding: 13px 22px;
   border-radius: var(--radius-md, 10px);
   text-decoration: none;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--border, #E2E8F0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all var(--transition, 150ms ease);
 }
 
 .githubBtn:hover {
+  background: var(--bg-card-hover, #F1F5FD);
+  border-color: var(--border-hover, rgba(37, 99, 235, 0.25));
+  transform: translateY(-2px);
+  color: var(--text-primary, #0F172A);
+}
+
+:global(:root[data-theme="dark"]) .githubBtn,
+:global(:root[data-theme="dim"]) .githubBtn {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary, #F8FAFC);
+  border-color: var(--border, rgba(255, 255, 255, 0.12));
+  box-shadow: none;
+}
+
+:global(:root[data-theme="dark"]) .githubBtn:hover,
+:global(:root[data-theme="dim"]) .githubBtn:hover {
   background: var(--bg-card-hover, rgba(255, 255, 255, 0.1));
   border-color: var(--border-hover, rgba(255, 255, 255, 0.25));
-  transform: translateY(-2px);
   color: #FFFFFF;
 }
 
@@ -253,11 +318,11 @@
   padding: 10px 20px 24px 20px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: var(--text-muted, #94A3B8);
+  color: var(--text-secondary, #334155);
 }
 
 .footerNote a {
-  color: var(--color-primary, #60A5FA);
+  color: var(--color-primary, #2563EB);
   text-decoration: none;
   font-weight: 600;
 }
@@ -270,24 +335,42 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  color: #FBBF24 !important;
+  color: #B45309 !important;
   text-decoration: none !important;
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 5px;
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(217, 119, 6, 0.1);
+  border: 1px solid rgba(217, 119, 6, 0.25);
   transition: all var(--transition, 150ms ease);
   vertical-align: baseline;
 }
 
 .starLink:hover {
-  background: rgba(251, 191, 36, 0.2);
-  border-color: rgba(251, 191, 36, 0.45);
+  background: rgba(217, 119, 6, 0.18);
+  border-color: rgba(217, 119, 6, 0.4);
   transform: translateY(-1px);
 }
 
 .starIcon {
+  color: #D97706;
+}
+
+:global(:root[data-theme="dark"]) .starLink,
+:global(:root[data-theme="dim"]) .starLink {
+  color: #FBBF24 !important;
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+:global(:root[data-theme="dark"]) .starLink:hover,
+:global(:root[data-theme="dim"]) .starLink:hover {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+:global(:root[data-theme="dark"]) .starIcon,
+:global(:root[data-theme="dim"]) .starIcon {
   color: #FBBF24;
 }
 
