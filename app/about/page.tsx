@@ -98,12 +98,13 @@ export default function AboutPage() {
             <div>
               <h3 className={styles.techTitle}>Engineered with Modern Performance</h3>
               <p className={styles.techDesc}>
-                Built on Next.js 14 (App Router), React 18, TypeScript, Google Drive v3 APIs, and a custom atomic JSON size cache.
+                Built on Next.js 16 (App Router), React 19, TypeScript, Google Drive v3 APIs, and a custom atomic JSON size cache.
               </p>
             </div>
           </div>
           <div className={styles.techBadges}>
-            <span className={styles.badge}>Next.js 14</span>
+            <span className={styles.badge}>Next.js 16</span>
+            <span className={styles.badge}>React 19</span>
             <span className={styles.badge}>TypeScript</span>
             <span className={styles.badge}>BFS Engine</span>
             <span className={styles.badge}>Lucide Icons</span>

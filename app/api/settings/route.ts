@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
       const msg = apiErr.message || String(apiErr);
       let hint = "";
       if (msg.includes("404") || msg.includes("File not found")) {
-        hint = " (File not found: Ensure the target Google Drive folder is shared with your Service Account email as Viewer or Editor).";
+        hint = " (File not found: Ensure the target Google Drive folder is shared with your Service Account email with Viewer access).";
       } else if (msg.includes("403")) {
         hint = " (Permission denied: Verify Google Drive API is enabled in your Google Cloud Console project).";
       }

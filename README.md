@@ -2,10 +2,11 @@
 
 <div align="center">
 
-[![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.17-green?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.9-green?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](https://github.com/HassanBDS/google-drive-dashboard/pulls)
 
 <br />
@@ -29,9 +30,11 @@ Analyze recursive folder volume, navigate multi-terabyte libraries with parallel
 > **Your credentials, tokens, and files remain strictly on your local machine.**
 
 - **100% Self-Hosted & Local**: Runs entirely on your personal computer (`http://localhost:3000`).
+- **Strictly Read-Only Scope (`drive.readonly`)**: Operates exclusively under `https://www.googleapis.com/auth/drive.readonly`. The dashboard has zero delete, rename, or write capabilities, guaranteeing your cloud files can never be modified, moved, or deleted.
 - **Zero Third-Party Telemetry**: No external backend servers, tracking scripts, analytics, or remote logging.
 - **Direct Google API Connection**: Traffic travels exclusively between your local server and official Google endpoints (`https://www.googleapis.com/drive/v3/*`).
 - **Strictly Isolated Keys**: Your Service Account JSON key (`secrets/service-account.json`) and environment settings (`.env.local`) are permanently ignored in `.gitignore`. They are never sent to the browser bundle, never uploaded, and never shared.
+- **Hardened Validation & Security Headers**: Enforces strict Drive ID format validation, path-traversal protection, and modern HTTP defensive headers (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`).
 - **Zero Creator Access**: The author of this project has no access to your Google Drive account, credentials, or files.
 
 ---
@@ -49,6 +52,7 @@ Native Google Drive does not calculate recursive folder sizes, making it difficu
 | **File Classification** | Basic text search filters only | Interactive capacity gauge & category filters (Media, Docs, Archives, >100MB) |
 | **Browsing Latency** | Cloud re-fetch per click | Instant local caching with subfolder deep-dive navigation |
 | **Cache Data Portability** | None | One-click consolidated JSON cache export |
+| **Safety & Permissions** | Requires broad read/write edit permissions in typical tools | Strict read-only scope (`drive.readonly`); zero mutation attack surface |
 | **Data Privacy** | Cloud hosted | Local self-hosted runtime; zero telemetry |
 
 ---
@@ -61,7 +65,8 @@ Native Google Drive does not calculate recursive folder sizes, making it difficu
 - **Storage Hygiene Audit**: Identifies storage waste automatically by detecting empty directories, candidate duplicate folder names, and oversized files (>100MB).
 - **Subfolder Deep-Dive Analysis**: Navigate complex subfolder hierarchies with responsive breadcrumb navigation and recursive volume breakdown per branch.
 - **File Explorer with Quick Filters**: Inspect individual files inside directories, switch between All, Media, Documents, Archives, or Large Files (>100MB), and view capacity distribution via an interactive SVG donut gauge.
-- **In-Place File Operations**: Rename directories and files with collision prevention, or move items to trash with confirmation safeguards.
+- **Folder Slideout Inspector**: Inspect detailed directory metadata, direct Google Drive links, file count distributions, and volume stats in a slideout drawer.
+- **Strict Read-Only Architecture**: Operates exclusively under `drive.readonly`safe and non-destructive with zero write, rename, or delete endpoints, guaranteeing your Drive files remain untouched.
 - **Offline Cache Export**: Download a consolidated JSON snapshot of precomputed directory weights for offline review or backup.
 - **Adaptive Theme Engine**: Curated dark, dim, and light themes with smooth CSS micro-interactions.
 
@@ -100,7 +105,7 @@ Examine files in any folder, filter instantaneously by category, and evaluate st
 
 ### Step 1: Install Node.js
 If Node.js is not already installed on your system, download the **LTS (Long Term Support)** installer:
-- **[Download Node.js (Windows, macOS, Linux)](https://nodejs.org/)**
+- **[Download Node.js (Windows, macOS, Linux)](https://nodejs.org/)** (Node.js >= 20.9 recommended)
 
 ---
 
@@ -140,7 +145,7 @@ Navigate to **[http://localhost:3000/settings](http://localhost:3000/settings)**
    - Select the created service account, navigate to the **Keys** tab, click **Add Key → Create new key → JSON**, and save the file.
 3. **Share Your Google Drive Folder**:
    - In `drive.google.com`, right-click the folder you wish to analyze, select **Share**, and paste the service account email (`...iam.gserviceaccount.com`).
-   - Assign the **Viewer** role (or **Editor** if you plan to use in-place rename/trash actions).
+   - Assign the **Viewer** role. (Read-only access is all that is required; the dashboard never modifies, deletes, or writes to your Drive).
 4. **Save in Dashboard**:
    - In the dashboard at `http://localhost:3000/settings`, upload your JSON key and input your Google Drive folder link or ID.
    - Click **Save & Verify**.
@@ -184,11 +189,11 @@ GDRIVE_DRIVE_NAME="Primary Drive"
 
 ```mermaid
 graph TD
-    User["Client Browser<br/>(React 18 / Next.js 14 / CSS Modules)"]
+    User["Client Browser<br/>(React 19 / Next.js 16 / CSS Modules)"]
     API["Next.js Route Handlers<br/>(app/api/drive/*)"]
     Scanner["Multi-Phase BFS Scanner Engine<br/>(lib/drive-size-scanner.ts)"]
-    GDriveClient["Google Drive API Client<br/>(lib/google-drive.ts)"]
-    GoogleCloud["Google Drive v3 API<br/>(Google Cloud Platform)"]
+    GDriveClient["Google Drive API Client (Read-Only)<br/>(lib/google-drive.ts)"]
+    GoogleCloud["Google Drive v3 API (drive.readonly)<br/>(Google Cloud Platform)"]
     DiskCache["Atomic Local Cache & Checkpoints<br/>(data/size-cache/)"]
 
     User -->|SSE Real-Time Stream & REST API| API
@@ -199,19 +204,25 @@ graph TD
     GDriveClient -->|Authenticated Service Account| GoogleCloud
 ```
 
-### 1. Multi-Phase BFS Parallel Scanner (`lib/drive-size-scanner.ts`)
+### 1. Modern Framework Baseline
+- **Next.js 16 & React 19**: Built natively on the Next.js 16 App Router architecture paired with React 19 Server/Client Components, Turbopack, and high-performance route handlers.
+- **Strict Parameter Validation**: Every route parameter (Drive ID format, depth clamping `1–10`, pagination `1–1000`, array caps) is strictly verified to eliminate IDOR and DoS attack vectors.
+- **Defensive HTTP Response Headers**: Configured with security headers including `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin`.
+
+### 2. Multi-Phase BFS Parallel Scanner (`lib/drive-size-scanner.ts`)
 To prevent HTTP timeouts when processing large libraries, the scanner separates discovery from calculation:
 - **Phase 1: Breadth-First Directory Discovery**: Explores the tree level-by-level using parallel BFS queue workers, populating structural metadata immediately.
 - **Phase 2: Bottom-Up Recursive Sizing**: Accumulates file weights upward from leaf nodes to root directories.
 
-### 2. Checkpointing & Recovery
+### 3. Checkpointing & Recovery
 - Every 30 processed folders, the engine atomically updates `data/size-cache/checkpoint.json`.
 - Interrupted or stopped scans resume from the latest saved checkpoint, preventing duplicate API requests and quota waste.
 
-### 3. Orphaned Cache Reconciliation
+### 4. Orphaned Cache Reconciliation
 - When directories are deleted or relocated directly inside Google Drive, the reconciliation cycle identifies orphan entries and purges outdated cache files automatically.
 
-### 4. Zero Client Leaks
+### 5. Strict Read-Only Privileges & Zero Client Leaks
+- Downscoped strictly to `https://www.googleapis.com/auth/drive.readonly`- the application contains zero write, rename, or trash endpoints.
 - All Google Drive API communication is executed on the local Node.js server.
 - Private keys and OAuth tokens are never exposed to client-side bundles.
 
