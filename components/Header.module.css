@@ -99,12 +99,39 @@
 }
 
 
+.mobileMenuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mobileMenuBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+}
+
 @media (max-width: 768px) {
   .header {
-    padding: 0 16px 0 60px;
+    padding: 0 16px;
+  }
+
+  .left {
+    gap: 10px;
+  }
+
+  .mobileMenuBtn {
+    display: inline-flex;
   }
 
   .searchWrap {
-    width: 180px;
+    width: 170px;
   }
 }

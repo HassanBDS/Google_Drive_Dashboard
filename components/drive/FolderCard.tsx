@@ -91,7 +91,7 @@ export default function FolderCardGrid({
   folderStats,
   statsLoading,
   onRefreshStats,
-  sortMode = "name-asc",
+  sortMode = "size-desc",
   onSortChange,
   onRefresh,
   depth = 0,
@@ -102,7 +102,7 @@ export default function FolderCardGrid({
   onInspect,
   parentTotalSize,
 }: FolderCardGridProps) {
-  const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [layout, setLayout] = useState<"grid" | "list">("list");
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -174,7 +174,8 @@ export default function FolderCardGrid({
           folderStats?.[a.id]?.recursiveTotalSize ?? folderStats?.[a.id]?.totalSize ?? 0;
         const sB =
           folderStats?.[b.id]?.recursiveTotalSize ?? folderStats?.[b.id]?.totalSize ?? 0;
-        return sB - sA;
+        if (sB !== sA) return sB - sA;
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
       });
     } else if (sortMode === "count-desc") {
       sorted.sort((a, b) => {
@@ -182,7 +183,8 @@ export default function FolderCardGrid({
           folderStats?.[a.id]?.directFolderCount ?? folderStats?.[a.id]?.folderCount ?? 0;
         const cB =
           folderStats?.[b.id]?.directFolderCount ?? folderStats?.[b.id]?.folderCount ?? 0;
-        return cB - cA;
+        if (cB !== cA) return cB - cA;
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
       });
     }
     return sorted;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Menu } from "lucide-react";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -23,6 +23,14 @@ export default function Header({
   return (
     <header className={styles.header} suppressHydrationWarning>
       <div className={styles.left} suppressHydrationWarning>
+        <button
+          type="button"
+          className={styles.mobileMenuBtn}
+          onClick={() => window.dispatchEvent(new CustomEvent("toggle-sidebar"))}
+          aria-label="Toggle navigation menu"
+        >
+          <Menu size={18} />
+        </button>
         <h2 className={styles.pageTitle}>{title}</h2>
       </div>
 

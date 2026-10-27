@@ -25,7 +25,8 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dim" | "dark">("dark");
   const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
 
@@ -34,20 +35,43 @@ export default function Sidebar() {
     const currentTheme = (document.documentElement.getAttribute("data-theme") as "light" | "dim" | "dark") || "dark";
     setTheme(currentTheme);
 
-    // Collapsed state sync
-    const savedCollapsed = localStorage.getItem("sidebar_collapsed") === "true";
-    setIsCollapsed(savedCollapsed);
-    if (savedCollapsed) {
+    // Collapsed state sync (defaults to folded/collapsed)
+    const isFolded = localStorage.getItem("sidebar_collapsed") !== "false";
+    setIsCollapsed(isFolded);
+    if (isFolded) {
       document.documentElement.classList.add("sidebar-collapsed");
     } else {
       document.documentElement.classList.remove("sidebar-collapsed");
     }
+
+    // Mobile / shortcut toggle listener
+    const handleToggle = () => {
+      if (window.innerWidth <= 768) {
+        setIsMobileOpen((prev) => !prev);
+      } else {
+        setIsCollapsed((prev) => {
+          const next = !prev;
+          localStorage.setItem("sidebar_collapsed", String(next));
+          if (next) {
+            document.documentElement.classList.add("sidebar-collapsed");
+          } else {
+            document.documentElement.classList.remove("sidebar-collapsed");
+          }
+          return next;
+        });
+      }
+    };
+    window.addEventListener("toggle-sidebar", handleToggle);
 
     // Status check
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => setIsConfigured(data.isConfigured))
       .catch(() => setIsConfigured(false));
+
+    return () => {
+      window.removeEventListener("toggle-sidebar", handleToggle);
+    };
   }, []);
 
   const toggleTheme = (newTheme: "light" | "dim" | "dark") => {
@@ -68,39 +92,53 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
-      {/* Brand Logo */}
-      <div className={styles.logoSection}>
-        <Link href="/" className={styles.logoLink} title="Google Drive Dashboard">
-          <BrandIcon size={34} />
-          {!isCollapsed && (
-            <div className={styles.logoText}>
-              <h1>Drive Dashboard</h1>
-              <span>Google Drive v3</span>
-            </div>
-          )}
-        </Link>
-      </div>
+    <>
+      {isMobileOpen && (
+        <div
+          className={styles.mobileBackdrop}
+          onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""} ${isMobileOpen ? styles.mobileOpen : ""}`}>
+        {/* Brand Logo */}
+        <div className={styles.logoSection}>
+          <Link
+            href="/"
+            className={styles.logoLink}
+            title="Google Drive Dashboard"
+            onClick={() => setIsMobileOpen(false)}
+          >
+            <BrandIcon size={34} />
+            {!isCollapsed && (
+              <div className={styles.logoText}>
+                <h1>Drive Dashboard</h1>
+                <span>Google Drive v3</span>
+              </div>
+            )}
+          </Link>
+        </div>
 
-      {/* Navigation */}
-      <nav className={styles.navSection}>
-        {navItems.map((item) => {
-          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          const Icon = item.icon;
+        {/* Navigation */}
+        <nav className={styles.navSection}>
+          {navItems.map((item) => {
+            const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const Icon = item.icon;
 
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`${styles.navItem} ${isActive ? styles.active : ""}`}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <Icon className={styles.navIcon} />
-              {!isCollapsed && <span className={styles.navItemLabel}>{item.label}</span>}
-            </Link>
-          );
-        })}
-      </nav>
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`${styles.navItem} ${isActive ? styles.active : ""}`}
+                title={isCollapsed ? item.label : undefined}
+                onClick={() => setIsMobileOpen(false)}
+              >
+                <Icon className={styles.navIcon} />
+                {!isCollapsed && <span className={styles.navItemLabel}>{item.label}</span>}
+              </Link>
+            );
+          })}
+        </nav>
 
       {/* Footer & Controls */}
       <div className={styles.sidebarFooter}>
@@ -154,5 +192,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
-  );
+  </>
+);
 }

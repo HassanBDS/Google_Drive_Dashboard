@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import Header from "@/components/Header";
 import Breadcrumbs from "@/components/drive/Breadcrumbs";
 import BentoMetrics from "@/components/drive/BentoMetrics";
@@ -86,7 +86,7 @@ function DriveDashboardContent() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [folderStats, setFolderStats] = useState<Record<string, FolderStat>>({});
   const [statsLoading, setStatsLoading] = useState(false);
-  const [sortMode, setSortMode] = useState<SortMode>("name-asc");
+  const [sortMode, setSortMode] = useState<SortMode>("size-desc");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -144,13 +144,19 @@ function DriveDashboardContent() {
     if (folderIds.length === 0) return;
     setStatsLoading(true);
     try {
-      const res = await fetch("/api/drive/bulk-stats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderIds, refresh }),
-      });
-      const bulk: Record<string, FolderStat> = await res.json();
-      setFolderStats((prev) => ({ ...prev, ...bulk }));
+      const BATCH_SIZE = 50;
+      for (let i = 0; i < folderIds.length; i += BATCH_SIZE) {
+        const chunk = folderIds.slice(i, i + BATCH_SIZE);
+        const res = await fetch("/api/drive/bulk-stats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folderIds: chunk, refresh }),
+        });
+        if (res.ok) {
+          const bulk: Record<string, FolderStat> = await res.json();
+          setFolderStats((prev) => ({ ...prev, ...bulk }));
+        }
+      }
     } catch {
       // Non-critical
     } finally {
@@ -362,6 +368,37 @@ function DriveDashboardContent() {
     : undefined;
 
   const effectiveDeepStats = currentDeepStats || rootDeepStats;
+
+  const effectiveFolderStats = useMemo(() => {
+    const merged: Record<string, FolderStat> = {};
+    if (deepScanData?.data) {
+      for (const [id, d] of Object.entries(deepScanData.data)) {
+        merged[id] = {
+          folderCount: d.folderCount || d.totalFolderCount || 0,
+          fileCount: d.totalFileCount || 0,
+          mediaCount: 0,
+          xmlCount: 0,
+          totalSize: d.totalSize || 0,
+          recursiveTotalSize: d.totalSize,
+          recursiveFileCount: d.totalFileCount,
+          recursiveFolderCount: d.totalFolderCount,
+          directFolderCount: d.folderCount,
+        };
+      }
+    }
+    for (const [id, s] of Object.entries(folderStats)) {
+      merged[id] = {
+        ...(merged[id] ?? {}),
+        ...s,
+        recursiveTotalSize: s.recursiveTotalSize ?? merged[id]?.recursiveTotalSize,
+        recursiveFileCount: s.recursiveFileCount ?? merged[id]?.recursiveFileCount,
+        recursiveFolderCount: s.recursiveFolderCount ?? merged[id]?.recursiveFolderCount,
+        directFolderCount: s.directFolderCount ?? merged[id]?.directFolderCount,
+      };
+    }
+    return merged;
+  }, [folderStats, deepScanData]);
+
   const depth = data ? Math.max(0, data.breadcrumbs.length - 1) : 0;
   const anyScanning = Array.from(folderScanStates.values()).some((s) => s.isScanning);
 
@@ -416,8 +453,6 @@ function DriveDashboardContent() {
 
         {data && (
           <>
-            <Breadcrumbs items={data.breadcrumbs} onNavigate={handleNavigate} />
-
             <BentoMetrics
               folderCount={stats?.folderCount ?? 0}
               fileCount={stats?.fileCount ?? 0}
@@ -434,13 +469,15 @@ function DriveDashboardContent() {
               totalLocalesCount={stats?.folderCount ?? 0}
               files={data.files}
               folders={data.folders}
-              folderStats={folderStats}
+              folderStats={effectiveFolderStats}
               folderScanStates={folderScanStates}
               activeCheckpoints={activeCheckpoints}
               onStartScan={(folderId) => startFolderScan(folderId, depth + 1)}
               onRefresh={handleRefresh}
               currentFolderId={currentFolder || undefined}
             />
+
+            <Breadcrumbs items={data.breadcrumbs} onNavigate={handleNavigate} />
 
             {anyScanning && (
               <ScanProgressPanel
@@ -452,7 +489,7 @@ function DriveDashboardContent() {
             <FolderCardGrid
               folders={filteredFolders}
               onOpen={handleNavigate}
-              folderStats={folderStats}
+              folderStats={effectiveFolderStats}
               statsLoading={statsLoading}
               onRefreshStats={handleRefreshStats}
               sortMode={sortMode}
@@ -476,7 +513,7 @@ function DriveDashboardContent() {
               folder={inspectedFolder}
               isOpen={Boolean(inspectedFolder)}
               onClose={() => setInspectedFolder(null)}
-              folderStats={inspectedFolder ? folderStats[inspectedFolder.id] : undefined}
+              folderStats={inspectedFolder ? effectiveFolderStats[inspectedFolder.id] : undefined}
               scanState={inspectedFolder ? folderScanStates.get(inspectedFolder.id) : undefined}
               checkpoint={inspectedFolder ? activeCheckpoints[inspectedFolder.id] : undefined}
               onStartScan={(folderId) => startFolderScan(folderId, depth + 1)}
